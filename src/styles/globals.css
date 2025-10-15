@@ -1,0 +1,397 @@
+/**
+ * ============================================================================
+ * GLOBAL STYLES - TAILWIND V4
+ * ============================================================================
+ * 
+ * This file contains the global CSS configuration for the Staff Attendance
+ * Management System using Tailwind CSS v4.
+ * 
+ * Key Features:
+ * - Light and dark mode color schemes
+ * - Custom color tokens for consistent theming
+ * - Typography system with default styles
+ * - Smooth theme transitions
+ * - Chart color palette
+ * - Sidebar theming
+ * 
+ * @file globals.css
+ */
+
+/* ============================================ */
+/* DARK MODE CONFIGURATION */
+/* ============================================ */
+
+/**
+ * Custom variant for dark mode
+ * Enables dark mode when 'dark' class is present on any ancestor
+ * This works with our ThemeProvider which adds 'dark' class to <html>
+ */
+@custom-variant dark (&:is(.dark *));
+
+/* ============================================ */
+/* LIGHT MODE THEME (DEFAULT) */
+/* ============================================ */
+
+/**
+ * Root CSS variables for light mode theme
+ * These are automatically converted to Tailwind utility classes
+ * 
+ * Color System:
+ * - Background/Foreground: Page and text colors
+ * - Card: Component backgrounds
+ * - Primary: Main brand color (blue)
+ * - Secondary: Supporting colors
+ * - Muted: Subtle backgrounds and disabled states
+ * - Accent: Highlighted elements
+ * - Destructive: Error/danger states
+ * - Border/Input: Form elements
+ * - Chart: Data visualization colors
+ * - Sidebar: Navigation theming
+ */
+:root {
+  /* --- Base Typography --- */
+  --font-size: 16px;                    /* Base font size for the application */
+  --font-weight-medium: 500;            /* Medium weight for headings and emphasis */
+  --font-weight-normal: 400;            /* Normal weight for body text */
+  
+  /* --- Core Colors --- */
+  --background: #ffffff;                /* Main background (white) */
+  --foreground: oklch(0.145 0 0);      /* Main text color (near-black) */
+  
+  /* --- Card Component Colors --- */
+  --card: #ffffff;                      /* Card background */
+  --card-foreground: oklch(0.145 0 0); /* Card text color */
+  
+  /* --- Popover/Modal Colors --- */
+  --popover: oklch(1 0 0);             /* Popover background (white) */
+  --popover-foreground: oklch(0.145 0 0); /* Popover text */
+  
+  /* --- Primary Brand Colors --- */
+  --primary: #030213;                   /* Primary brand color (dark blue) */
+  --primary-foreground: oklch(1 0 0);  /* Text on primary background (white) */
+  --blue-primary: #2563eb;             /* Primary blue for buttons and links */
+  --blue-light: #eff6ff;               /* Light blue for backgrounds */
+  
+  /* --- Secondary Colors --- */
+  --secondary: oklch(0.95 0.0058 264.53);      /* Secondary background */
+  --secondary-foreground: #030213;              /* Secondary text */
+  
+  /* --- Muted/Subtle Colors --- */
+  --muted: #ececf0;                    /* Muted background (light gray) */
+  --muted-foreground: #717182;         /* Muted text (medium gray) */
+  
+  /* --- Accent Colors --- */
+  --accent: #e9ebef;                   /* Accent background */
+  --accent-foreground: #030213;        /* Accent text */
+  
+  /* --- Destructive/Error Colors --- */
+  --destructive: #d4183d;              /* Error/danger color (red) */
+  --destructive-foreground: #ffffff;   /* Text on error background (white) */
+  
+  /* --- Form Element Colors --- */
+  --border: rgba(0, 0, 0, 0.1);        /* Border color (subtle) */
+  --input: transparent;                 /* Input border (uses border color) */
+  --input-background: #f3f3f5;         /* Input background (light gray) */
+  --switch-background: #cbced4;        /* Switch/toggle background */
+  --ring: oklch(0.708 0 0);            /* Focus ring color */
+  
+  /* --- Chart Colors --- */
+  /* Used for data visualization in statistics and reports */
+  --chart-1: oklch(0.646 0.222 41.116);  /* Orange */
+  --chart-2: oklch(0.6 0.118 184.704);   /* Cyan */
+  --chart-3: oklch(0.398 0.07 227.392);  /* Blue */
+  --chart-4: oklch(0.828 0.189 84.429);  /* Yellow */
+  --chart-5: oklch(0.769 0.188 70.08);   /* Lime */
+  
+  /* --- Border Radius --- */
+  --radius: 0.625rem;                  /* Base border radius (10px) for rounded corners */
+  
+  /* --- Sidebar Colors --- */
+  --sidebar: oklch(0.985 0 0);                    /* Sidebar background */
+  --sidebar-foreground: oklch(0.145 0 0);        /* Sidebar text */
+  --sidebar-primary: #030213;                     /* Sidebar active item background */
+  --sidebar-primary-foreground: oklch(0.985 0 0); /* Sidebar active item text */
+  --sidebar-accent: oklch(0.97 0 0);             /* Sidebar hover background */
+  --sidebar-accent-foreground: oklch(0.205 0 0); /* Sidebar hover text */
+  --sidebar-border: oklch(0.922 0 0);            /* Sidebar border */
+  --sidebar-ring: oklch(0.708 0 0);              /* Sidebar focus ring */
+}
+
+/* ============================================ */
+/* DARK MODE THEME */
+/* ============================================ */
+
+/**
+ * Dark mode CSS variables
+ * These override the light mode colors when 'dark' class is on <html>
+ * 
+ * Design Philosophy:
+ * - Dark backgrounds with light text for reduced eye strain
+ * - Slightly muted colors for better dark mode aesthetics
+ * - Sufficient contrast for accessibility (WCAG AA compliant)
+ * - Consistent with modern dark mode UI patterns
+ */
+.dark {
+  /* --- Core Colors --- */
+  --background: oklch(0.145 0 0);       /* Dark background (near-black) */
+  --foreground: oklch(0.985 0 0);      /* Light text (near-white) */
+  
+  /* --- Card Component Colors --- */
+  --card: oklch(0.145 0 0);            /* Dark card background */
+  --card-foreground: oklch(0.985 0 0); /* Light card text */
+  
+  /* --- Popover/Modal Colors --- */
+  --popover: oklch(0.145 0 0);         /* Dark popover background */
+  --popover-foreground: oklch(0.985 0 0); /* Light popover text */
+  
+  /* --- Primary Brand Colors --- */
+  --primary: oklch(0.985 0 0);         /* Light primary (inverted from light mode) */
+  --primary-foreground: oklch(0.205 0 0); /* Dark text on primary */
+  --blue-primary: #3b82f6;             /* Brighter blue for dark mode */
+  --blue-light: #1e293b;               /* Dark blue for backgrounds */
+  
+  /* --- Secondary Colors --- */
+  --secondary: oklch(0.269 0 0);       /* Dark secondary background */
+  --secondary-foreground: oklch(0.985 0 0); /* Light secondary text */
+  
+  /* --- Muted/Subtle Colors --- */
+  --muted: oklch(0.269 0 0);           /* Dark muted background */
+  --muted-foreground: oklch(0.708 0 0); /* Medium gray text */
+  
+  /* --- Accent Colors --- */
+  --accent: oklch(0.269 0 0);          /* Dark accent background */
+  --accent-foreground: oklch(0.985 0 0); /* Light accent text */
+  
+  /* --- Destructive/Error Colors --- */
+  --destructive: oklch(0.396 0.141 25.723);      /* Muted red for dark mode */
+  --destructive-foreground: oklch(0.637 0.237 25.331); /* Light red text */
+  
+  /* --- Form Element Colors --- */
+  --border: oklch(0.269 0 0);          /* Subtle dark border */
+  --input: oklch(0.269 0 0);           /* Input border */
+  --input-background: oklch(0.22 0 0); /* Darker input background */
+  --switch-background: oklch(0.35 0 0); /* Dark switch background */
+  --ring: oklch(0.439 0 0);            /* Medium focus ring */
+  
+  /* --- Typography (same as light mode) --- */
+  --font-weight-medium: 500;
+  --font-weight-normal: 400;
+  
+  /* --- Chart Colors (adjusted for dark mode) --- */
+  --chart-1: oklch(0.488 0.243 264.376);  /* Blue */
+  --chart-2: oklch(0.696 0.17 162.48);    /* Green */
+  --chart-3: oklch(0.769 0.188 70.08);    /* Yellow */
+  --chart-4: oklch(0.627 0.265 303.9);    /* Purple */
+  --chart-5: oklch(0.645 0.246 16.439);   /* Orange */
+  
+  /* --- Sidebar Colors (dark mode) --- */
+  --sidebar: oklch(0.205 0 0);                    /* Dark sidebar background */
+  --sidebar-foreground: oklch(0.985 0 0);        /* Light sidebar text */
+  --sidebar-primary: oklch(0.488 0.243 264.376); /* Blue active item */
+  --sidebar-primary-foreground: oklch(0.985 0 0); /* Light active item text */
+  --sidebar-accent: oklch(0.269 0 0);            /* Dark hover background */
+  --sidebar-accent-foreground: oklch(0.985 0 0); /* Light hover text */
+  --sidebar-border: oklch(0.269 0 0);            /* Dark sidebar border */
+  --sidebar-ring: oklch(0.439 0 0);              /* Medium focus ring */
+}
+
+/* ============================================ */
+/* TAILWIND V4 THEME CONFIGURATION */
+/* ============================================ */
+
+/**
+ * Theme inline configuration for Tailwind v4
+ * Converts our CSS variables into Tailwind utility classes
+ * 
+ * Example Usage:
+ * - bg-background → uses var(--background)
+ * - text-foreground → uses var(--foreground)
+ * - border-border → uses var(--border)
+ * - rounded-lg → uses var(--radius-lg)
+ * 
+ * This allows us to use semantic class names that automatically
+ * adapt to light/dark mode through CSS variables.
+ */
+@theme inline {
+  /* --- Color Mappings --- */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-input-background: var(--input-background);
+  --color-switch-background: var(--switch-background);
+  --color-ring: var(--ring);
+  
+  /* --- Chart Color Mappings --- */
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  
+  /* --- Border Radius Variants --- */
+  --radius-sm: calc(var(--radius) - 4px);  /* Small radius (6px) */
+  --radius-md: calc(var(--radius) - 2px);  /* Medium radius (8px) */
+  --radius-lg: var(--radius);               /* Large radius (10px) */
+  --radius-xl: calc(var(--radius) + 4px);  /* Extra large radius (14px) */
+  
+  /* --- Sidebar Color Mappings --- */
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+/* ============================================ */
+/* BASE LAYER - Global Element Styles */
+/* ============================================ */
+
+/**
+ * Base layer styles apply to all elements globally
+ * These create consistent baseline styling across the application
+ */
+@layer base {
+  /* --- Universal Styles --- */
+  /**
+   * Apply consistent border and focus ring colors
+   * All elements get these defaults unless overridden
+   */
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  /* --- HTML Element --- */
+  /**
+   * Root HTML element with smooth theme transitions
+   * Transitions help when switching between light/dark mode
+   */
+  html {
+    transition: background-color 0.3s ease, color 0.3s ease;
+    font-size: var(--font-size);  /* Base font size (16px) */
+  }
+
+  /* --- Body Element --- */
+  /**
+   * Body uses semantic background and text colors
+   * Automatically adapts to light/dark mode via CSS variables
+   */
+  body {
+    @apply bg-background text-foreground;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  
+  /* --- Smooth Color Transitions --- */
+  /**
+   * All elements smoothly transition color changes
+   * Provides polished UX when switching themes or hovering elements
+   * 
+   * Affects: backgrounds, borders, text, SVG fills/strokes
+   * Duration: 0.3s (300ms)
+   * Timing: Ease (smooth acceleration/deceleration)
+   */
+  * {
+    transition-property: background-color, border-color, color, fill, stroke;
+    transition-timing-function: ease;
+    transition-duration: 0.3s;
+  }
+}
+
+/* ============================================ */
+/* TYPOGRAPHY SYSTEM */
+/* ============================================ */
+
+/**
+ * Default typography styles for HTML elements
+ * 
+ * These styles only apply to elements without custom Tailwind text classes.
+ * If an element or its ancestor has a Tailwind text class (e.g., text-sm, text-lg),
+ * these defaults are skipped to allow for custom sizing.
+ * 
+ * This gives us:
+ * 1. Sensible defaults for unstyled content
+ * 2. Easy overrides with Tailwind classes when needed
+ * 3. Consistent typography throughout the app
+ * 
+ * Design System:
+ * - Headings (h1-h4): Medium weight, larger sizes, 1.5 line height
+ * - Paragraphs: Normal weight, base size, 1.5 line height
+ * - Labels/Buttons: Medium weight for emphasis
+ * - Inputs: Normal weight for readability
+ */
+@layer base {
+  :where(:not(:has([class*=" text-"]), :not(:has([class^="text-"])))) {
+    /* --- Heading 1 (Main Page Titles) --- */
+    h1 {
+      font-size: var(--text-2xl);              /* 24px / 1.5rem */
+      font-weight: var(--font-weight-medium);  /* 500 */
+      line-height: 1.5;                        /* Comfortable reading */
+    }
+
+    /* --- Heading 2 (Section Titles) --- */
+    h2 {
+      font-size: var(--text-xl);               /* 20px / 1.25rem */
+      font-weight: var(--font-weight-medium);  /* 500 */
+      line-height: 1.5;
+    }
+
+    /* --- Heading 3 (Subsection Titles) --- */
+    h3 {
+      font-size: var(--text-lg);               /* 18px / 1.125rem */
+      font-weight: var(--font-weight-medium);  /* 500 */
+      line-height: 1.5;
+    }
+
+    /* --- Heading 4 (Card Titles) --- */
+    h4 {
+      font-size: var(--text-base);             /* 16px / 1rem */
+      font-weight: var(--font-weight-medium);  /* 500 */
+      line-height: 1.5;
+    }
+
+    /* --- Paragraphs (Body Text) --- */
+    p {
+      font-size: var(--text-base);             /* 16px / 1rem */
+      font-weight: var(--font-weight-normal);  /* 400 */
+      line-height: 1.5;
+    }
+
+    /* --- Labels (Form Labels) --- */
+    label {
+      font-size: var(--text-base);             /* 16px / 1rem */
+      font-weight: var(--font-weight-medium);  /* 500 - emphasis */
+      line-height: 1.5;
+    }
+
+    /* --- Buttons --- */
+    button {
+      font-size: var(--text-base);             /* 16px / 1rem */
+      font-weight: var(--font-weight-medium);  /* 500 - emphasis */
+      line-height: 1.5;
+    }
+
+    /* --- Input Fields --- */
+    input {
+      font-size: var(--text-base);             /* 16px / 1rem */
+      font-weight: var(--font-weight-normal);  /* 400 */
+      line-height: 1.5;
+    }
+  }
+}
