@@ -373,10 +373,7 @@ export interface Holiday {
   id: string;
   name: string;
   date: string;
-  type: 'Public' | 'Company' | 'Floating';
   recurring: boolean;
-  description?: string;
-  createdAt: string;
 }
 
 /**
@@ -657,12 +654,7 @@ export interface SystemUser {
   id: string;
   username: string;
   email: string;
-  fullName: string;
   role: 'Admin' | 'Manager' | 'Agent';
-  status: 'Active' | 'Inactive';
-  lastLogin?: string;
-  createdAt: string;
-  updatedAt: string;
 }
 
 /**

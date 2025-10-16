@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card } from '../ui/card';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
@@ -44,7 +44,7 @@ import { usersService } from '../../lib/api';
 import type { SystemUser, PasswordResetRequest } from '../../lib/api/types';
 import { useTheme } from '../../lib/theme-context';
 import { useAuth } from '../../lib/auth-context';
-import { toast } from 'sonner@2.0.3';
+import { toast } from 'sonner';
 import { ConfirmDialog } from '../ConfirmDialog';
 
 export function Settings() {
@@ -308,7 +308,6 @@ export function Settings() {
                   <TableHead className="dark:text-gray-300">Username</TableHead>
                   <TableHead className="dark:text-gray-300">Email</TableHead>
                   <TableHead className="dark:text-gray-300">Role</TableHead>
-                  <TableHead className="dark:text-gray-300">Status</TableHead>
                   <TableHead className="text-right dark:text-gray-300">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -337,17 +336,6 @@ export function Settings() {
                       >
                         <Shield className="w-3 h-3 mr-1" />
                         {user.role}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Badge 
-                        variant={user.status === 'Active' ? 'default' : 'secondary'}
-                        className={user.status === 'Active' 
-                          ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/30' 
-                          : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-                        }
-                      >
-                        {user.status}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">
@@ -503,18 +491,6 @@ export function Settings() {
                     <SelectItem value="Admin">Admin</SelectItem>
                     <SelectItem value="Manager">Manager</SelectItem>
                     <SelectItem value="Agent">Agent</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="edit-status" className="dark:text-gray-200">Status</Label>
-                <Select defaultValue={editingUser.status}>
-                  <SelectTrigger className="bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-600 dark:text-gray-100">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Active">Active</SelectItem>
-                    <SelectItem value="Inactive">Inactive</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

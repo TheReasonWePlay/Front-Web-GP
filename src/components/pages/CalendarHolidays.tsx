@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card } from '../ui/card';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
@@ -32,7 +32,7 @@ import { calendarService } from '../../lib/api';
 import type { Holiday } from '../../lib/api/types';
 import { getDayStatistics, type DayStatistics } from '../../lib/api/legacy-types';
 import { ConfirmDialog } from '../ConfirmDialog';
-import { toast } from 'sonner@2.0.3';
+import { toast } from 'sonner';
 
 const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -40,8 +40,11 @@ const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'Jul
 export function CalendarHolidays() {
   const [holidays, setHolidays] = useState<Holiday[]>([]);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [currentDate, setCurrentDate] = useState(new Date(2025, 9, 1)); // October 2025
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [currentDate, setCurrentDate] = useState(() => {
+    const now = new Date();
+    return new Date(now.getFullYear(), now.getMonth(), 1);
+  });
+    const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [dayDetails, setDayDetails] = useState<DayStatistics | null>(null);
   const [loading, setLoading] = useState(true);
   
@@ -49,6 +52,16 @@ export function CalendarHolidays() {
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [holidayToDelete, setHolidayToDelete] = useState<Holiday | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  // état du formulaire d'ajout
+  const [newHoliday, setNewHoliday] = useState({
+    name: '',
+    date: '',        // "YYYY-MM-DD"
+    recurring: false,
+  });
+
+  // état envoi
+  const [isSubmittingHoliday, setIsSubmittingHoliday] = useState(false);
 
   // Fetch holidays from API
   useEffect(() => {
@@ -69,6 +82,61 @@ export function CalendarHolidays() {
     };
     fetchHolidays();
   }, [currentDate]);
+
+
+// simple validation minimale
+const validateHoliday = (h: { name: string; date: string }) => {
+  if (!h.name || !h.date) {
+    return 'Please provide a title and a date for the holiday.';
+  }
+  // optionally validate date format YYYY-MM-DD
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(h.date)) {
+    return 'Date must be in YYYY-MM-DD format.';
+  }
+  return null;
+};
+
+const handleAddHoliday = async () => {
+  const err = validateHoliday(newHoliday);
+  if (err) {
+    toast?.error ? toast.error(err) : alert(err);
+    return;
+  }
+
+  try {
+    setIsSubmittingHoliday(true);
+
+    // appelle ton service back
+    const response = await calendarService.createHoliday({
+      name: newHoliday.name,
+      date: newHoliday.date,
+      recurring: newHoliday.recurring,
+    });
+
+    // réponse attendue: { success: true, data: Holiday }
+    if (response?.success && response.data) {
+      // Met à jour la liste locale (optimistic / client-side)
+      setHolidays(prev => [ ...prev, response.data ]);
+
+      // feedback
+      toast?.success ? toast.success('Holiday added') : console.log('Holiday added');
+
+      // reset form + fermer modal
+      setNewHoliday({ name: '', date: '', recurring: false });
+      setIsAddDialogOpen(false);
+    } else {
+      // Backend a renvoyé une erreur contrôlée
+      const message = response?.error || response?.message || 'Failed to create holiday';
+      toast?.error ? toast.error(message) : console.error(message);
+    }
+  } catch (error: any) {
+    console.error('Error creating holiday:', error);
+    toast?.error ? toast.error(error?.message || 'Network error') : alert(error?.message || 'Network error');
+  } finally {
+    setIsSubmittingHoliday(false);
+  }
+};
+
 
   const getDaysInMonth = (date: Date) => {
     const year = date.getFullYear();
@@ -105,7 +173,7 @@ export function CalendarHolidays() {
     if (day === null) return null;
     const dateStr = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
     const holiday = holidays.find(h => h.date === dateStr);
-    return holiday?.title;
+    return holiday?.name;
   };
 
   const isToday = (day: number | null) => {
@@ -139,7 +207,7 @@ export function CalendarHolidays() {
       if (response.success) {
         setHolidays(holidays.filter(h => h.id !== holidayToDelete.id));
         toast.success('Holiday deleted successfully', {
-          description: `${holidayToDelete.title} has been removed from the calendar.`,
+          description: `${holidayToDelete.name} has been removed from the calendar.`,
         });
       } else {
         toast.error('Failed to delete holiday', {
@@ -326,7 +394,7 @@ export function CalendarHolidays() {
                   <div key={holiday.id} className="p-3 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
-                        <p className="text-sm text-gray-900 dark:text-gray-100">{holiday.title}</p>
+                        <p className="text-sm text-gray-900 dark:text-gray-100">{holiday.name}</p>
                         <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                           {new Date(holiday.date).toLocaleDateString('en-US', {
                             month: 'long',
@@ -382,28 +450,59 @@ export function CalendarHolidays() {
             <div className="grid gap-4 py-4">
               <div className="grid gap-2">
                 <Label htmlFor="title" className="dark:text-gray-200">Holiday Title</Label>
-                <Input id="title" placeholder="e.g., New Year's Day" className="bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-600 dark:text-gray-100" />
+                <Input
+                  id="title"
+                  placeholder="e.g., New Year's Day"
+                  value={newHoliday.name}
+                  onChange={(e) => setNewHoliday({...newHoliday, name: e.target.value})}
+                  className="bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-600 dark:text-gray-100"
+                />
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="date" className="dark:text-gray-200">Date</Label>
-                <Input id="date" type="date" className="bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-600 dark:text-gray-100" />
+                <Input
+                  id="date"
+                  type="date"
+                  value={newHoliday.date}
+                  onChange={(e) => setNewHoliday({...newHoliday, date: e.target.value})}
+                  className="bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-600 dark:text-gray-100"
+                />
               </div>
               <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
                 <div>
                   <Label htmlFor="recurring" className="dark:text-gray-200">Recurring Holiday</Label>
                   <p className="text-sm text-gray-500 dark:text-gray-400">Repeat this holiday every year</p>
                 </div>
-                <Switch id="recurring" />
+                <Switch
+                  id="recurring"
+                  checked={newHoliday.recurring}
+                  onCheckedChange={(val) => setNewHoliday({...newHoliday, recurring: !!val})}
+                />
               </div>
             </div>
             <DialogFooter>
-              <Button variant="outline" onClick={() => setIsAddDialogOpen(false)} className="dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700">Cancel</Button>
-              <Button className="bg-blue-600 hover:bg-blue-700" onClick={() => setIsAddDialogOpen(false)}>
-                Add Holiday
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setIsAddDialogOpen(false);
+                  // reset form optionally
+                  setNewHoliday({ name: '', date: '', recurring: false });
+                }}
+                className="dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+              >
+                Cancel
+              </Button>
+              <Button
+                className="bg-blue-600 hover:bg-blue-700"
+                onClick={handleAddHoliday}
+                disabled={isSubmittingHoliday}
+              >
+                {isSubmittingHoliday ? 'Adding...' : 'Add Holiday'}
               </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
+
 
         {/* Day Details Dialog */}
         <Dialog open={!!selectedDate} onOpenChange={() => setSelectedDate(null)}>
@@ -649,7 +748,7 @@ export function CalendarHolidays() {
           onOpenChange={setConfirmDialogOpen}
           title="Delete Holiday"
           description="Are you sure you want to delete this holiday? This will affect all work schedules and attendance calculations."
-          itemName={holidayToDelete ? `${holidayToDelete.title} (${holidayToDelete.date})` : ''}
+          itemName={holidayToDelete ? `${holidayToDelete.name} (${holidayToDelete.date})` : ''}
           confirmText="Yes, Delete Holiday"
           onConfirm={handleDeleteConfirm}
           isLoading={isDeleting}
