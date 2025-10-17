@@ -47,6 +47,8 @@ export function CalendarHolidays() {
     const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [dayDetails, setDayDetails] = useState<DayStatistics | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const [dayStatsMap, setDayStatsMap] = useState<Record<string, DayStatistics>>({});
   
   // Confirm dialog state for delete operations
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
@@ -62,6 +64,29 @@ export function CalendarHolidays() {
 
   // état envoi
   const [isSubmittingHoliday, setIsSubmittingHoliday] = useState(false);
+
+  //--------------------------
+
+  useEffect(() => {
+    const loadMonthStats = async () => {
+      const year = currentDate.getFullYear();
+      const month = currentDate.getMonth();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+  
+      const statsByDate: Record<string, DayStatistics> = {};
+  
+      for (let day = 1; day <= daysInMonth; day++) {
+        const date = new Date(year, month, day);
+        const stats = await getDayStatistics(date);
+        statsByDate[date.toISOString().split('T')[0]] = stats;
+      }
+  
+      setDayStatsMap(statsByDate);
+    };
+  
+    loadMonthStats();
+  }, [currentDate]);
+  
 
   // Fetch holidays from API
   useEffect(() => {
@@ -225,18 +250,29 @@ const handleAddHoliday = async () => {
     }
   };
 
-  const handleDateClick = (day: number | null) => {
+  const handleDateClick = async (day: number | null) => {
     if (day === null) return;
     const clickedDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
     setSelectedDate(clickedDate);
-    setDayDetails(getDayStatistics(clickedDate));
+  
+    try {
+      const data = await getDayStatistics(clickedDate);
+      setDayDetails(data);
+      console.log("Day details:", data);
+    } catch (error) {
+      console.error("Error fetching day statistics:", error);
+    }
   };
+  
 
   const getDayStats = (day: number | null) => {
     if (day === null) return null;
-    const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
-    return getDayStatistics(date);
+    const dateStr = new Date(currentDate.getFullYear(), currentDate.getMonth(), day)
+      .toISOString()
+      .split('T')[0];
+    return dayStatsMap[dateStr] || null;
   };
+  
 
   return (
     <TooltipProvider delayDuration={300}>
@@ -281,6 +317,7 @@ const handleAddHoliday = async () => {
               ))}
               {getDaysInMonth(currentDate).map((day, index) => {
                 const stats = getDayStats(day);
+                console.log(stats);
                 
                 return (
                   <Tooltip key={index}>

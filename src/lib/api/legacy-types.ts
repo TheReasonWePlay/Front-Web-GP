@@ -4,6 +4,8 @@
  * They map to the new API types where possible
  */
 
+import { API_CONFIG } from './config';
+
 // Re-export common types from the new API types
 export type { 
   Agent, 
@@ -52,18 +54,14 @@ export interface PointageRecord {
   id: string;
   agentId: string;
   agentName: string;
+  division: string;
   checkInAM: string;
   checkOutAM: string;
   checkInPM: string;
   checkOutPM: string;
-  status: 'present' | 'late' | 'early-departure' | 'overtime';
-  division: string;
-  temporaryExits: TemporaryExitInfo[];
+  status: 'present' | 'late' | 'early-departure' | 'overtime' | 'absent';
   totalMissedTime: string; // Format: "2h 30m"
-  notes?: string;
-  // Legacy fields for backward compatibility
-  checkIn?: string;
-  checkOut?: string;
+  temporaryExits: TemporaryExitInfo[];
 }
 
 export interface DayStatistics {
@@ -119,20 +117,28 @@ export const getAgentDetails = async (agentId: string): Promise<AgentDetails> =>
  * NOTE: This should be replaced with statisticsService API call
  */
 export const getDayStatistics = async (date: Date): Promise<DayStatistics> => {
-  const dateStr = date.toISOString().split('T')[0];
-  
-  // Placeholder - in real implementation, this would call the API
-  return {
-    date: dateStr,
-    totalAgents: 0,
-    present: 0,
-    absent: 0,
-    late: 0,
-    attendanceRate: 0,
-    punctualityRate: 0,
-    pointageRecords: [],
-  };
+  const dateStr = [
+    date.getFullYear(),
+    String(date.getMonth() + 1).padStart(2, '0'),
+    String(date.getDate()).padStart(2, '0')
+  ].join('-');
+
+  const response = await fetch(`${API_CONFIG.BASE_URL}/attendance?date=${dateStr}`, {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${localStorage.getItem('access_token') || ''}`,
+    },
+  });
+
+  if (!response.ok) {
+    console.log("ok reponse");
+    throw new Error(`Failed to fetch day statistics: ${response.statusText}`);
+  }
+
+  const result = await response.json();
+  return result.data;
 };
+
 
 /**
  * Generate password reset token
