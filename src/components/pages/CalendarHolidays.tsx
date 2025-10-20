@@ -188,18 +188,49 @@ const handleAddHoliday = async () => {
     return dayOfWeek === 0 || dayOfWeek === 6;
   };
 
+  const formatLocalYMD = (isoOrDate: string | Date) => {
+    const d = typeof isoOrDate === 'string' ? new Date(isoOrDate) : isoOrDate;
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  };
+  
+  const formatLocalMD = (isoOrDate: string | Date) => {
+    const d = typeof isoOrDate === 'string' ? new Date(isoOrDate) : isoOrDate;
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${m}-${day}`;
+  };
+  
   const isHoliday = (day: number | null) => {
     if (day === null) return false;
     const dateStr = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-    return holidays.some(h => h.date === dateStr);
+  
+    return holidays.some(h => {
+      // normal date comparison (local)
+      if (h.recurring) {
+        // recurring holiday: compare month-day only
+        return formatLocalMD(h.date) === formatLocalMD(dateStr);
+      }
+      return formatLocalYMD(h.date) === dateStr;
+    });
   };
-
+  
   const getHolidayTitle = (day: number | null) => {
     if (day === null) return null;
     const dateStr = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-    const holiday = holidays.find(h => h.date === dateStr);
-    return holiday?.name;
+  
+    const holiday = holidays.find(h => {
+      if (h.recurring) {
+        return formatLocalMD(h.date) === formatLocalMD(dateStr);
+      }
+      return formatLocalYMD(h.date) === dateStr;
+    });
+  
+    return holiday?.name ?? null;
   };
+  
 
   const isToday = (day: number | null) => {
     if (day === null) return false;

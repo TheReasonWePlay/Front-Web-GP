@@ -559,13 +559,10 @@ export interface MonthlyAttendance {
  * }
  */
 export interface RecentActivity {
-  activityId: string;
-  matricule: string;
   agentName: string;
-  type: 'check-in' | 'check-out' | 'leave-request' | 'schedule-change';
+  type: 'check-in' | 'check-out' | 'leave-request';
   description: string;
   timestamp: string;
-  status?: 'success' | 'pending' | 'warning';
 }
 
 /**

@@ -191,7 +191,7 @@ export const API_CONFIG = {
      * GET /statistics/dashboard - Get dashboard KPIs
      * Returns: totalAgents, presentToday, absentToday, lateToday, etc.
      */
-    DASHBOARD_STATS: '/statistics/dashboard',
+    DASHBOARD_STATS: '/dashboard/stats',
     
     /**
      * GET /statistics/attendance - Get attendance statistics
@@ -199,7 +199,7 @@ export const API_CONFIG = {
      * 
      * Query params: period (daily/weekly/monthly), startDate, endDate
      */
-    ATTENDANCE_STATS: '/statistics/attendance',
+    ATTENDANCE_STATS: '/dashboard/attendance-stats',
     
     /**
      * GET /statistics/reports - Get recent activity reports
@@ -207,6 +207,10 @@ export const API_CONFIG = {
      * 
      * Query params: limit, offset
      */
+
+    RECENT_ACTIVITY: '/dashboard/activities',
+
+
     REPORTS: '/statistics/reports',
     
     /**

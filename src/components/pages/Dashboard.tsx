@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Card } from '../ui/card';
 import { Button } from '../ui/button';
+import React from 'react';
 import { Badge } from '../ui/badge';
 import { Skeleton } from '../ui/skeleton';
 import { Alert, AlertDescription } from '../ui/alert';
@@ -22,7 +23,7 @@ import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, L
 import { statisticsService } from '../../lib/api';
 import { useApi } from '../../lib/hooks/useApi';
 import type { DashboardStats, RecentActivity } from '../../lib/api/types';
-import { toast } from 'sonner@2.0.3';
+import { toast } from 'sonner';
 
 export function Dashboard() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
@@ -118,8 +119,6 @@ export function Dashboard() {
         return <CheckCircle2 className="w-5 h-5 text-blue-600 dark:text-blue-400" />;
       case 'leave-request':
         return <XCircle className="w-5 h-5 text-red-600 dark:text-red-400" />;
-      case 'schedule-change':
-        return <AlertCircle className="w-5 h-5 text-blue-600 dark:text-blue-400" />;
       default:
         return <AlertCircle className="w-5 h-5 text-gray-600 dark:text-gray-400" />;
     }
@@ -133,30 +132,10 @@ export function Dashboard() {
         return 'bg-green-100 dark:bg-green-900/30';
       case 'leave-request':
         return 'bg-red-100 dark:bg-red-900/30';
-      case 'schedule-change':
-        return 'bg-blue-100 dark:bg-blue-900/30';
       default:
         return 'bg-gray-100 dark:bg-gray-700';
     }
-  };
-
-  // Get activity status badge
-  const getActivityStatusBadge = (activity: RecentActivity) => {
-    if (!activity.status) return null;
-
-    const statusConfig = {
-      success: { label: 'Success', className: 'bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400 border-green-200 dark:border-green-700' },
-      pending: { label: 'Pending', className: 'bg-yellow-50 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 border-yellow-200 dark:border-yellow-700' },
-      warning: { label: 'Late', className: 'bg-orange-50 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 border-orange-200 dark:border-orange-700' },
-    };
-
-    const config = statusConfig[activity.status];
-    return (
-      <Badge variant="outline" className={`mt-2 text-xs ${config.className}`}>
-        {config.label}
-      </Badge>
-    );
-  };
+  };  
 
   // Loading skeleton
   if (loading) {
@@ -320,7 +299,7 @@ export function Dashboard() {
           {activities.length > 0 ? (
             <div className="space-y-4">
               {activities.map((activity) => (
-                <div key={activity.id} className="flex items-start gap-4 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                <div className="flex items-start gap-4 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
                   <div className={`p-2 rounded-lg ${getActivityBgColor(activity.type)}`}>
                     {getActivityIcon(activity.type)}
                   </div>
@@ -332,7 +311,7 @@ export function Dashboard() {
                       </span>
                     </div>
                     <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{activity.description}</p>
-                    {getActivityStatusBadge(activity)}
+                    
                   </div>
                 </div>
               ))}

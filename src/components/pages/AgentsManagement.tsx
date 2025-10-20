@@ -879,22 +879,18 @@ export function AgentsManagement() {
                           <Clock className="w-6 h-6 text-blue-600 dark:text-blue-400" />
                           <h4 className="text-gray-900 dark:text-gray-100">Daily Attendance Details</h4>
                         </div>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <Button variant="outline" className="rounded-lg border-gray-300 dark:border-gray-600">
-                              <Calendar className="w-4 h-4 mr-2" />
-                              {selectedDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0" align="end">
-                            <CalendarComponent
-                              mode="single"
-                              selected={selectedDate}
-                              onSelect={(date) => date && setSelectedDate(date)}
-                              initialFocus
-                            />
-                          </PopoverContent>
-                        </Popover>
+                        <Input
+                          type="date"
+                          value={selectedDate.toISOString().split('T')[0]}
+                          onChange={(e) => {
+                            if (e.target.value) {
+                              setSelectedDate(new Date(e.target.value));
+                            }
+                          }}
+                          max={new Date().toISOString().split('T')[0]}
+                          min="2020-01-01"
+                          className="w-auto bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-600 dark:text-gray-100 rounded-lg"
+                        />
                       </div>
 
                       {loadingAttendance ? (

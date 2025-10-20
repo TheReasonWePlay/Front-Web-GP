@@ -81,7 +81,7 @@ class StatisticsService {
    */
   async getRecentActivities(limit: number = 10): Promise<ApiResponse<RecentActivity[]>> {
     try {
-      const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.REPORTS}?limit=${limit}`;
+      const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.RECENT_ACTIVITY}?limit=${limit}`;
       
       const response = await fetch(url, {
         method: 'GET',
