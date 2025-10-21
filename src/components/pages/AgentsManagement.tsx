@@ -35,6 +35,7 @@ import {
 } from '../ui/select';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import { Calendar as CalendarComponent } from '../ui/calendar';
+import { QRCodeCanvas, QRCodeSVG  } from 'qrcode.react';
 import { Textarea } from '../ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { Label } from '../ui/label';
@@ -726,52 +727,14 @@ export function AgentsManagement() {
                           id="qr-code-container" 
                           className="bg-white p-6 rounded-lg border-2 border-gray-200 dark:border-gray-600"
                         >
-                          <svg
-                            width="200"
-                            height="200"
-                            viewBox="0 0 200 200"
-                            className="qr-code"
-                          >
-                            {/* Generate a simple QR-like pattern based on matricule */}
-                            <rect width="200" height="200" fill="white" />
-                            {/* QR Code pattern simulation */}
-                            {(() => {
-                              const blocks: JSX.Element[] = [];
-                              const seed = viewingAgent.matricule.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-                              const blockSize = 10;
-                              for (let i = 0; i < 20; i++) {
-                                for (let j = 0; j < 20; j++) {
-                                  // Create pseudo-random pattern based on matricule
-                                  const shouldFill = ((i * 20 + j + seed) % 3) === 0;
-                                  if (shouldFill) {
-                                    blocks.push(
-                                      <rect
-                                        key={`${i}-${j}`}
-                                        x={i * blockSize}
-                                        y={j * blockSize}
-                                        width={blockSize}
-                                        height={blockSize}
-                                        fill="black"
-                                      />
-                                    );
-                                  }
-                                }
-                              }
-                              return blocks;
-                            })()}
-                            {/* Corner markers */}
-                            <rect x="0" y="0" width="30" height="30" fill="black" />
-                            <rect x="5" y="5" width="20" height="20" fill="white" />
-                            <rect x="10" y="10" width="10" height="10" fill="black" />
-                            
-                            <rect x="170" y="0" width="30" height="30" fill="black" />
-                            <rect x="175" y="5" width="20" height="20" fill="white" />
-                            <rect x="180" y="10" width="10" height="10" fill="black" />
-                            
-                            <rect x="0" y="170" width="30" height="30" fill="black" />
-                            <rect x="5" y="175" width="20" height="20" fill="white" />
-                            <rect x="10" y="180" width="10" height="10" fill="black" />
-                          </svg>
+                          <QRCodeSVG 
+                            value={viewingAgent.matricule}
+                            size={200}
+                            bgColor="#FFFFFF"
+                            fgColor="#000000"
+                            level="H"
+                            includeMargin={false}
+                          />
                         </div>
                         
                         {/* Agent Info Below QR Code */}
@@ -805,6 +768,7 @@ export function AgentsManagement() {
                                       margin: 0;
                                       padding: 20px;
                                       font-family: system-ui, -apple-system, sans-serif;
+                                      background: white;
                                     }
                                     .qr-container {
                                       text-align: center;
@@ -815,10 +779,6 @@ export function AgentsManagement() {
                                     }
                                     .qr-code {
                                       margin: 0 auto 20px;
-                                      border: 2px solid #e5e7eb;
-                                      border-radius: 8px;
-                                      padding: 20px;
-                                      background: white;
                                     }
                                     h2 {
                                       margin: 10px 0 5px;
@@ -867,6 +827,7 @@ export function AgentsManagement() {
                           <Printer className="w-4 h-4 mr-2" />
                           Print QR Code
                         </Button>
+
                       </div>
                     </Card>
                   </TabsContent>
