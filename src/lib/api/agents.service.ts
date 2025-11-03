@@ -21,6 +21,7 @@
 
 // --- Dependencies ---
 import { API_CONFIG } from './config';
+import { fetchWithAuth } from './fetchWithAuth';
 import type { Agent, AgentDetails, AgentAttendance, DailyAttendanceDetails, TemporaryExit, LongAbsence, ApiResponse, PaginatedResponse } from './types';
 
 /**
@@ -85,14 +86,7 @@ class AgentsService {
       // Construct full URL with query string
       const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.AGENTS}${queryParams.toString() ? '?' + queryParams.toString() : ''}`;
       
-      // Make HTTP request with authentication
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('access_token') || ''}`,
-        },
-      });
+      const response = await fetchWithAuth(url, { method: 'GET' });
       
       // Check for HTTP errors
       if (!response.ok) {
@@ -133,14 +127,10 @@ class AgentsService {
   async getAgentById(matricule: string): Promise<ApiResponse<AgentDetails>> {
     try {
       // Make HTTP request with dynamic matricule in path
-      const response = await fetch(
+      const response = await fetchWithAuth(
         `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.AGENT_BY_ID(matricule)}`,
         {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('access_token') || ''}`,
-          },
+          method: 'GET'
         }
       );
       
@@ -190,15 +180,11 @@ class AgentsService {
   async createAgent(agent: Agent): Promise<ApiResponse<Agent>> {
     try {
       // Send POST request with agent data in body
-      const response = await fetch(
+      const response = await fetchWithAuth(
         `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.AGENTS}`,
         {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('access_token') || ''}`,
-          },
-          body: JSON.stringify(agent),
+          body: JSON.stringify(agent)
         }
       );
       
@@ -250,15 +236,11 @@ class AgentsService {
     try {
       // Send PUT request with partial updates
       console.log(updates);
-      const response = await fetch(
+      const response = await fetchWithAuth(
         `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.AGENT_BY_ID(matricule)}`,
         {
           method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('access_token') || ''}`,
-          },
-          body: JSON.stringify(updates),
+          body: JSON.stringify(updates)
         }
       );
       
@@ -308,14 +290,10 @@ class AgentsService {
   async deleteAgent(matricule: string): Promise<ApiResponse<void>> {
     try {
       // Send DELETE request
-      const response = await fetch(
+      const response = await fetchWithAuth(
         `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.AGENT_BY_ID(matricule)}`,
         {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('access_token') || ''}`,
-          },
+          method: 'DELETE'
         }
       );
       
@@ -383,12 +361,8 @@ class AgentsService {
       const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.AGENT_ATTENDANCE(matricule)}${queryParams.toString() ? '?' + queryParams.toString() : ''}`;
       
       // Make HTTP request
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('access_token') || ''}`,
-        },
+      const response = await fetchWithAuth(url, {
+        method: 'GET'
       });
       
       // Check for HTTP errors
@@ -430,14 +404,10 @@ class AgentsService {
     date: string
   ): Promise<ApiResponse<DailyAttendanceDetails>> {
     try {
-      const response = await fetch(
+      const response = await fetchWithAuth(
         `${API_CONFIG.BASE_URL}/agents/${matricule}/attendance/${date}`,
         {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('access_token') || ''}`,
-          },
+          method: 'GET'
         }
       );
       
@@ -470,14 +440,10 @@ class AgentsService {
     date: string
   ): Promise<ApiResponse<TemporaryExit[]>> {
     try {
-      const response = await fetch(
+      const response = await fetchWithAuth(
         `${API_CONFIG.BASE_URL}/agents/${matricule}/temporary-exits/${date}`,
         {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('access_token') || ''}`,
-          },
+          method: 'GET'
         }
       );
       
@@ -506,14 +472,10 @@ class AgentsService {
    */
   async getLongAbsences(matricule: string): Promise<ApiResponse<LongAbsence[]>> {
     try {
-      const response = await fetch(
+      const response = await fetchWithAuth(
         `${API_CONFIG.BASE_URL}/agents/${matricule}/absences`,
         {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('access_token') || ''}`,
-          },
+          method: 'GET'
         }
       );
       
@@ -546,14 +508,10 @@ class AgentsService {
     absence: Omit<LongAbsence, 'id' | 'matricule'>
   ): Promise<ApiResponse<LongAbsence>> {
     try {
-      const response = await fetch(
+      const response = await fetchWithAuth(
         `${API_CONFIG.BASE_URL}/agents/${matricule}/absences`,
         {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('access_token') || ''}`,
-          },
           body: JSON.stringify(absence),
         }
       );
@@ -589,14 +547,10 @@ class AgentsService {
     updates: Partial<LongAbsence>
   ): Promise<ApiResponse<LongAbsence>> {
     try {
-      const response = await fetch(
+      const response = await fetchWithAuth(
         `${API_CONFIG.BASE_URL}/agents/${matricule}/absences/${absenceId}`,
         {
           method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('access_token') || ''}`,
-          },
           body: JSON.stringify(updates),
         }
       );
@@ -630,14 +584,10 @@ class AgentsService {
     absenceId: string
   ): Promise<ApiResponse<void>> {
     try {
-      const response = await fetch(
+      const response = await fetchWithAuth(
         `${API_CONFIG.BASE_URL}/agents/${matricule}/absences/${absenceId}`,
         {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('access_token') || ''}`,
-          },
+          method: 'DELETE'
         }
       );
       

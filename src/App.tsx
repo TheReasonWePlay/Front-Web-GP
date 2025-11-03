@@ -41,7 +41,6 @@ import { WorkSchedules } from './components/pages/WorkSchedules';
 import { CalendarHolidays } from './components/pages/CalendarHolidays';
 import { Statistics } from './components/pages/Statistics';
 import { Settings } from './components/pages/Settings';
-import { PersonalHistory } from './components/pages/PersonalHistory';
 
 // --- UI Components ---
 import { Toaster } from './components/ui/sonner';
@@ -173,14 +172,6 @@ export default function App() {
                 Agents can view their attendance, performance, and print QR code
                 This is the landing page for Agent users
               */}
-              <Route 
-                path="personal-history" 
-                element={
-                  <RoleBasedRoute allowedRoles={['Agent']}>
-                    <PersonalHistory />
-                  </RoleBasedRoute>
-                } 
-              />
               
               {/* --- Common Routes (All Roles) --- */}
               

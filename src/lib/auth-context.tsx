@@ -179,41 +179,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
    * }
    */
   const login = async (username: string, password: string): Promise<{ success: boolean; error?: string }> => {
-    // Simulate network delay in mock mode for realistic UX
-    if (API_CONFIG.USE_MOCK) {
-      await mockDelay(800);
-    }
-
-    // --- Mock Authentication (Development) ---
-    if (API_CONFIG.USE_MOCK) {
-      // Search for user in mock database
-      const user = mockUsersDb.find(
-        u => u.username.toLowerCase() === username.toLowerCase() && u.password === password
-      );
-
-      // Invalid credentials
-      if (!user) {
-        return {
-          success: false,
-          error: 'Invalid username or password',
-        };
-      }
-
-      // Create user session (exclude password from session data)
-      const userSession: CurrentUser = {
-        id: user.id,
-        username: user.username,
-        email: user.email,
-        role: user.role,
-      };
-
-      // Store session in state and localStorage
-      setCurrentUser(userSession);
-      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userSession));
-
-      return { success: true };
-    }
-
     // --- Real API Authentication (Production) ---
     try {
       // Make POST request to login endpoint

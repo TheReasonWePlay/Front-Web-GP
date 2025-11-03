@@ -39,11 +39,7 @@ export function Login() {
   useEffect(() => {
     if (isAuthenticated && currentUser) {
       // Redirect based on user role
-      if (currentUser.role === 'Agent') {
-        navigate('/personal-history', { replace: true });
-      } else {
         navigate('/', { replace: true });
-      }
     }
   }, [isAuthenticated, currentUser, navigate]);
 
