@@ -203,7 +203,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Create user session from API response
       const userSession: CurrentUser = {
         id: data.data.user.id,
-        username: data.data.user.username,
+        username: data.data.user.nom_utilisateur,
         email: data.data.user.email,
         role: data.data.user.role,
       };

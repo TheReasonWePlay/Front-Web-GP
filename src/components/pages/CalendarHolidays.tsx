@@ -114,12 +114,21 @@ const validateHoliday = (h: { name: string; date: string }) => {
   if (!h.name || !h.date) {
     return 'Please provide a title and a date for the holiday.';
   }
-  // optionally validate date format YYYY-MM-DD
+
+  // ✅ Vérification du nom (lettres, accents, espaces, tirets, apostrophes)
+  const nameRegex = /^[A-Za-zÀ-ÖØ-öø-ÿ\s'-]+$/;
+  if (!nameRegex.test(h.name.trim())) {
+    return "The holiday name contains invalid characters.";
+  }
+
+  // ✅ Vérification du format de date (YYYY-MM-DD)
   if (!/^\d{4}-\d{2}-\d{2}$/.test(h.date)) {
     return 'Date must be in YYYY-MM-DD format.';
   }
+
   return null;
 };
+
 
 const handleAddHoliday = async () => {
   const err = validateHoliday(newHoliday);
@@ -816,7 +825,7 @@ const handleAddHoliday = async () => {
           onOpenChange={setConfirmDialogOpen}
           title="Delete Holiday"
           description="Are you sure you want to delete this holiday? This will affect all work schedules and attendance calculations."
-          itemName={holidayToDelete ? `${holidayToDelete.name} (${holidayToDelete.date})` : ''}
+          itemName={holidayToDelete ? `${holidayToDelete.name} (${formatLocalMD(holidayToDelete.date)})` : ''}
           confirmText="Yes, Delete Holiday"
           onConfirm={handleDeleteConfirm}
           isLoading={isDeleting}

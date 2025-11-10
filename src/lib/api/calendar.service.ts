@@ -4,6 +4,7 @@
  */
 
 import { API_CONFIG } from './config';
+import { fetchWithAuth } from './fetchWithAuth';
 import type { Holiday, CalendarEvent, ApiResponse } from './types';
 
 class CalendarService {
@@ -24,12 +25,8 @@ class CalendarService {
       
       const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.HOLIDAYS}${queryParams.toString() ? '?' + queryParams.toString() : ''}`;
       
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('access_token') || ''}`,
-        },
+      const response = await fetchWithAuth(url, {
+        method: 'GET'
       });
       
       if (!response.ok) {
@@ -58,12 +55,9 @@ class CalendarService {
       
       const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.CALENDAR_EVENTS}${queryParams.toString() ? '?' + queryParams.toString() : ''}`;
       
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('access_token') || ''}`,
-        },
+      const response = await fetchWithAuth
+      (url, {
+        method: 'GET'
       });
       
       if (!response.ok) {
@@ -82,14 +76,10 @@ class CalendarService {
    */
   async createHoliday(holiday: Omit<Holiday, 'id' | 'createdAt'>): Promise<ApiResponse<Holiday>> {
     try {
-      const response = await fetch(
+      const response = await fetchWithAuth(
         `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.HOLIDAYS}`,
         {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('access_token') || ''}`,
-          },
           body: JSON.stringify(holiday),
         }
       );
@@ -110,14 +100,10 @@ class CalendarService {
    */
   async updateHoliday(id: string, updates: Partial<Holiday>): Promise<ApiResponse<Holiday>> {
     try {
-      const response = await fetch(
+      const response = await fetchWithAuth(
         `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.HOLIDAY_BY_ID(id)}`,
         {
           method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('access_token') || ''}`,
-          },
           body: JSON.stringify(updates),
         }
       );
@@ -138,14 +124,10 @@ class CalendarService {
    */
   async deleteHoliday(id: string): Promise<ApiResponse<void>> {
     try {
-      const response = await fetch(
+      const response = await fetchWithAuth(
         `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.HOLIDAY_BY_ID(id)}`,
         {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('access_token') || ''}`,
-          },
+          method: 'DELETE'
         }
       );
       

@@ -218,13 +218,63 @@ export function AgentsManagement() {
     }
   };
 
+  const validateAgent = (agent: Agent): boolean => {
+    const matriculeRegex = /^[A-Za-z0-9]+$/;
+    const nameRegex = /^[A-Za-zÀ-ÖØ-öø-ÿ\s'-]+$/;
+    const departmentRegex = /^[A-Za-zÀ-ÖØ-öø-ÿ\s'-]+$/;
+    const positionRegex = /^[A-Za-zÀ-ÖØ-öø-ÿ\s'-]+$/;
+  
+    if (!agent.matricule?.trim()) {
+      toast.error('Le matricule est obligatoire');
+      return false;
+    }
+    if (!matriculeRegex.test(agent.matricule)) {
+      toast.error('Le matricule ne doit contenir que des lettres et chiffres');
+      return false;
+    }
+  
+    if (!agent.nom?.trim()) {
+      toast.error('Le nom est obligatoire');
+      return false;
+    }
+    if (!nameRegex.test(agent.nom)) {
+      toast.error('Le nom contient des caractères non valides');
+      return false;
+    }
+  
+    if (!agent.division?.trim()) {
+      toast.error('Le département est obligatoire');
+      return false;
+    }
+    if (!departmentRegex.test(agent.division)) {
+      toast.error('Le département contient des caractères non valides');
+      return false;
+    }
+  
+    if (!agent.poste?.trim()) {
+      toast.error('Le poste est obligatoire');
+      return false;
+    }
+    if (!positionRegex.test(agent.poste)) {
+      toast.error('Le poste contient des caractères non valides');
+      return false;
+    }
+  
+    return true;
+  };
+
   const handleAddAgent = async () => {
+    if (!validateAgent(newAgent)) return;
+  
+    // Si tout est OK → on envoie
     try {
       const response = await agentsService.createAgent(newAgent);
       if (response.success && response.data) {
         setAgents([...agents, response.data]);
         setIsAddDialogOpen(false);
-        // Reset form
+        toast.success('Agent ajouté avec succès !');
+  
+        // Reset du formulaire
         setNewAgent({
           matricule: '',
           name: '',
@@ -233,12 +283,14 @@ export function AgentsManagement() {
         });
       }
     } catch (error) {
-      console.error('Failed to create agent:', error);
+      console.error('Erreur lors de la création de l’agent :', error);
+      toast.error('Erreur lors de la création de l’agent');
     }
   };
 
   const handleUpdateAgent = async () => {
     if (!editingAgent) return;
+    if (!validateAgent(editingAgent)) return;
     
     try {
       const response = await agentsService.updateAgent(editingAgent.matricule, editingAgent);
@@ -287,12 +339,31 @@ export function AgentsManagement() {
 
   const handleSaveAbsence = async () => {
     if (!viewingAgent) return;
-    
-    if (!absenceForm.startDate || !absenceForm.endDate || !absenceForm.reason) {
-      toast.error('Please fill in all required fields');
+  
+    const { startDate, endDate, reason } = absenceForm;
+  
+    // Vérifie les champs obligatoires
+    if (!startDate || !endDate || !reason) {
+      toast.error('Veuillez remplir tous les champs obligatoires');
       return;
     }
-
+  
+    // Vérifie cohérence des dates
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+  
+    if (start > end) {
+      toast.error('La date de début ne peut pas être postérieure à la date de fin');
+      return;
+    }
+  
+    // Validation du motif (avec accents et apostrophes)
+    const reasonRegex = /^[A-Za-zÀ-ÖØ-öø-ÿ\s'’.,()\-]{3,100}$/;
+    if (!reasonRegex.test(reason.trim())) {
+      toast.error("Le motif d'absence contient des caractères non valides");
+      return;
+    }
+  
     try {
       if (editingAbsence) {
         const response = await agentsService.updateLongAbsence(
@@ -301,7 +372,7 @@ export function AgentsManagement() {
           absenceForm
         );
         if (response.success && response.data) {
-          toast.success('Absence updated successfully');
+          toast.success('Absence mise à jour avec succès');
           setAbsences(absences.map(a => a.id === editingAbsence.id ? response.data! : a));
         }
       } else {
@@ -310,16 +381,19 @@ export function AgentsManagement() {
           absenceForm
         );
         if (response.success && response.data) {
-          toast.success('Absence created successfully');
+          toast.success('Absence ajoutée avec succès');
           setAbsences([...absences, response.data]);
         }
       }
+  
       handleCloseAbsenceDialog();
     } catch (error) {
-      console.error('Failed to save absence:', error);
-      toast.error('Failed to save absence');
+      console.error('Erreur lors de la sauvegarde de l’absence :', error);
+      toast.error('Erreur lors de la sauvegarde');
     }
   };
+  
+  
 
   const handleDeleteAbsenceClick = (absence: LongAbsence) => {
     setAbsenceToDelete(absence);
@@ -1203,7 +1277,7 @@ export function AgentsManagement() {
         onOpenChange={setConfirmDialogOpen}
         title="Delete Agent"
         description="Are you sure you want to delete this agent? This will permanently remove all their data including attendance records and cannot be undone."
-        itemName={agentToDelete ? `${agentToDelete.name} (${agentToDelete.matricule})` : ''}
+        itemName={agentToDelete ? `${agentToDelete.nom} (${agentToDelete.matricule})` : ''}
         confirmText="Yes, Delete Agent"
         onConfirm={handleDeleteConfirm}
         isLoading={isDeleting}
@@ -1215,7 +1289,7 @@ export function AgentsManagement() {
         onOpenChange={setConfirmAbsenceDialogOpen}
         title="Delete Absence"
         description="Are you sure you want to delete this absence record? This action cannot be undone."
-        itemName={absenceToDelete ? `${absenceToDelete.type} (${absenceToDelete.startDate} - ${absenceToDelete.endDate})` : ''}
+        itemName={absenceToDelete ? `${absenceToDelete.type} (${formatDateForInput(absenceToDelete.startDate)} - ${formatDateForInput(absenceToDelete.endDate)})` : ''}
         confirmText="Yes, Delete Absence"
         onConfirm={handleDeleteAbsenceConfirm}
         isLoading={isDeletingAbsence}

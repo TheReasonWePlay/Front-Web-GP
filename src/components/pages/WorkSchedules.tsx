@@ -73,12 +73,47 @@ export function WorkSchedules() {
     setNewSchedule((prev) => ({ ...prev, [field]: value }));
   };
 
+  const validateSchedule = (schedule) => {
+    const { name, morningStart, morningEnd, afternoonStart, afternoonEnd, tolerance } = schedule;
+  
+    if (!name || !name.trim()) {
+      toast.error("Le nom de l'horaire est requis");
+      return false;
+    }
+  
+    if (morningStart >= morningEnd) {
+      toast.error("L'heure de début du matin doit être avant l'heure de fin du matin");
+      return false;
+    }
+  
+    if (afternoonStart >= afternoonEnd) {
+      toast.error("L'heure de début de l'après-midi doit être avant l'heure de fin de l'après-midi");
+      return false;
+    }
+  
+    if (morningEnd > afternoonStart) {
+      toast.error("L'heure de fin du matin doit être avant le début de l'après-midi");
+      return false;
+    }
+  
+    if (isNaN(tolerance) || tolerance < 0) {
+      toast.error("La tolérance doit être un nombre positif");
+      return false;
+    }
+  
+    return true; // ✅ Toutes les validations sont passées
+  };
+  
+
   const handleCreateSchedule = async () => {
+
+    if (!validateSchedule(newSchedule)) return;
+    
     try {
       const response = await schedulesService.createSchedule(newSchedule);
       if (response.success && response.data) {
         setSchedules((prev) => [...prev, response.data]);
-        toast.success('Schedule created successfully');
+        toast.success("Horaire créé avec succès !");
         setIsAddDialogOpen(false);
         setNewSchedule({
           id: '',
@@ -91,13 +126,14 @@ export function WorkSchedules() {
           isActive: false,
         });
       } else {
-        toast.error('Failed to create schedule');
+        toast.error('Échec de la création de l’horaire');
       }
     } catch (error) {
       console.error('Error creating schedule:', error);
-      toast.error('An unexpected error occurred');
+      toast.error('Une erreur inattendue est survenue');
     }
   };
+  
 
   // Handlers for Edit
   const handleEditChange = (field: keyof WorkSchedule, value: any) => {
@@ -108,6 +144,9 @@ export function WorkSchedules() {
 
   const handleSaveChanges = async () => {
     if (!editingSchedule) return;
+
+    if (!validateSchedule(editingSchedule)) return; 
+
     try {
       const response = await schedulesService.updateSchedule(editingSchedule.id, editingSchedule);
       if (response.success && response.data) {
@@ -250,7 +289,7 @@ export function WorkSchedules() {
                       size="icon"
                       onClick={() => handleDeleteClick(schedule)}
                       className="hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-600 dark:hover:text-red-400"
-                      disabled={schedule.isActive}
+                      disabled={!schedule.deletable}
                     >
                       <Trash2 className="w-4 h-4" />
                     </Button>

@@ -19,7 +19,7 @@
 
 // --- Dependencies ---
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
-import { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 
 // --- Icons ---
 import { 
@@ -52,7 +52,7 @@ import {
   DropdownMenuTrigger 
 } from './ui/dropdown-menu';
 import { Badge } from './ui/badge';
-import { toast } from 'sonner@2.0.3';
+import { toast } from 'sonner';
 
 // --- Type Definitions ---
 
@@ -63,13 +63,13 @@ import { toast } from 'sonner@2.0.3';
  * @property {string} path - Route path
  * @property {string} label - Display label in navigation
  * @property {any} icon - Lucide icon component
- * @property {Array<'Admin' | 'Manager' | 'Agent'>} roles - Roles allowed to see this nav item
+ * @property {Array<'Admin' | 'Manager'>} roles - Roles allowed to see this nav item
  */
 type NavItem = {
   path: string;
   label: string;
   icon: any;
-  roles: Array<'Admin' | 'Manager' | 'Agent'>;
+  roles: Array<'Admin' | 'Manager'>;
 };
 
 // --- Navigation Configuration ---
@@ -95,8 +95,7 @@ const navItems: NavItem[] = [
   { path: '/schedules', label: 'Work Schedules', icon: Calendar, roles: ['Admin', 'Manager'] },
   { path: '/calendar', label: 'Calendar & Holidays', icon: CalendarDays, roles: ['Admin', 'Manager'] },
   { path: '/statistics', label: 'Statistics & Reports', icon: BarChart3, roles: ['Admin', 'Manager'] },
-  { path: '/personal-history', label: 'Personal History', icon: History, roles: ['Agent'] },
-  { path: '/settings', label: 'Settings & Users', icon: Settings, roles: ['Admin', 'Manager', 'Agent'] },
+  { path: '/settings', label: 'Settings & Users', icon: Settings, roles: ['Admin', 'Manager'] },
 ];
 
 // --- Layout Component ---
@@ -303,38 +302,6 @@ export function Layout() {
               >
                 <User className="w-4 h-4 mr-3" />
                 My Profile
-              </DropdownMenuItem>
-              
-              <DropdownMenuItem 
-                onClick={handleNotifications}
-                className="cursor-pointer dark:hover:bg-gray-700 dark:text-gray-200 focus:bg-blue-50 dark:focus:bg-blue-950 focus:text-blue-600 dark:focus:text-blue-400"
-              >
-                <Bell className="w-4 h-4 mr-3" />
-                Notifications
-                <Badge 
-                  variant="secondary" 
-                  className="ml-auto bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 text-xs px-2"
-                >
-                  3
-                </Badge>
-              </DropdownMenuItem>
-
-              {isAdmin && (
-                <DropdownMenuItem 
-                  onClick={() => navigate('/settings')}
-                  className="cursor-pointer dark:hover:bg-gray-700 dark:text-gray-200 focus:bg-purple-50 dark:focus:bg-purple-950 focus:text-purple-600 dark:focus:text-purple-400"
-                >
-                  <Settings className="w-4 h-4 mr-3" />
-                  Admin Settings
-                </DropdownMenuItem>
-              )}
-              
-              <DropdownMenuItem 
-                onClick={handleHelp}
-                className="cursor-pointer dark:hover:bg-gray-700 dark:text-gray-200 focus:bg-blue-50 dark:focus:bg-blue-950 focus:text-blue-600 dark:focus:text-blue-400"
-              >
-                <HelpCircle className="w-4 h-4 mr-3" />
-                Help & Support
               </DropdownMenuItem>
               
               <DropdownMenuSeparator className="dark:bg-gray-700" />

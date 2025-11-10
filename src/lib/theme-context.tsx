@@ -16,6 +16,7 @@
  */
 
 // --- Dependencies ---
+import React from 'react';
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 
 // --- Type Definitions ---

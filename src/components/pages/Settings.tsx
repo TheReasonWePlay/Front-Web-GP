@@ -46,6 +46,7 @@ import { useTheme } from '../../lib/theme-context';
 import { useAuth } from '../../lib/auth-context';
 import { toast } from 'sonner';
 import { ConfirmDialog } from '../ConfirmDialog';
+import { User } from '../../lib/api/legacy-types';
 
 export function Settings() {
   const { theme, toggleTheme } = useTheme();
@@ -88,6 +89,20 @@ export function Settings() {
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<SystemUser | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  const [confirmResetDialogOpen, setConfirmResetDialogOpen] = useState(false);
+const [userToReset, setUserToReset] = useState<SystemUser | null>(null);
+const [isResetting, setIsResetting] = useState(false);
+    // Password change states (for current user)
+    const [isChangePasswordDialogOpen, setIsChangePasswordDialogOpen] = useState(false);
+    const [currentPassword, setCurrentPassword] = useState('');
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmNewPassword, setConfirmNewPassword] = useState('');
+    const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+    const [showNewPassword, setShowNewPassword] = useState(false);
+    const [showConfirmNewPassword, setShowConfirmNewPassword] = useState(false);
+    const [isChangingPassword, setIsChangingPassword] = useState(false);
+  
 
   // Timer for password auto-hide (30 seconds)
   useEffect(() => {
@@ -138,83 +153,147 @@ export function Settings() {
     }
   };
 
-  const handlePasswordManagement = (user: User) => {
-    // Check authorization - only admins can access password management
-    if (!isAdmin) {
-      setIsUnauthorizedDialogOpen(true);
+  const [newUsername, setNewUsername] = useState('');
+  const [newEmail, setNewEmail] = useState('');
+  const [newRole, setNewRole] = useState('');
+
+  const [editUsername, setEditUsername] = useState('');
+  const [editEmail, setEditEmail] = useState('');
+  const [editRole, setEditRole] = useState('');
+
+  // Loading states pour Add/Update
+  const [isAdding, setIsAdding] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
+
+  // Quand on ouvre le dialog d'ajout, reset les champs
+  useEffect(() => {
+    if (isAddDialogOpen) {
+      setNewUsername('');
+      setNewEmail('');
+      setNewRole('');
+    }
+  }, [isAddDialogOpen]);
+
+  // Quand on ouvre le dialog d'édition, on remplit les champs avec l'utilisateur à modifier
+  useEffect(() => {
+    if (editingUser) {
+      setEditUsername(editingUser.username);
+      setEditEmail(editingUser.email);
+      setEditRole(editingUser.role);
+    } else {
+      setEditUsername('');
+      setEditEmail('');
+      setEditRole('');
+    }
+  }, [editingUser]);
+
+  // Gestion création utilisateur
+  const validateEmail = (email: string) => {
+    // Simple regex email (pas parfaite mais suffisante pour la plupart des cas)
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
+  };
+  
+  const validateUsername = (username: string) => {
+    // Alphanumérique + underscore, 3 à 20 caractères
+    const re = /^[a-zA-Z0-9_]{3,20}$/;
+    return re.test(username);
+  };
+  
+  const validRoles = ['Admin', 'Manager'];
+  
+  const handleAddUser = async () => {
+    if (!newUsername || !newEmail || !newRole) {
+      toast.error('Please fill all fields');
       return;
     }
-
-    setPasswordDialogUser(user);
-    setRevealedPassword(null);
-    setResetToken(null);
-    setShowPassword(false);
-    setPasswordRevealTimer(0);
-    setCopiedToken(false);
-  };
-
-  const handleRevealPassword = () => {
-    if (!passwordDialogUser) return;
-
+  
+    if (!validateUsername(newUsername)) {
+      toast.error('Username must be 3-20 characters, alphanumeric or underscores only.');
+      return;
+    }
+  
+    if (!validateEmail(newEmail)) {
+      toast.error('Please enter a valid email address.');
+      return;
+    }
+  
+    if (!validRoles.includes(newRole)) {
+      toast.error('Please select a valid role.');
+      return;
+    }
+  
     try {
-      const password = revealUserPassword(
-        passwordDialogUser.id,
-        currentUser.username,
-        currentUser.role
-      );
-      setRevealedPassword(password);
-      setShowPassword(true);
-      setPasswordRevealTimer(30); // 30 seconds timer
-      toast.success('Password revealed temporarily (30 seconds)', {
-        description: 'The password will be automatically hidden after 30 seconds',
-        duration: 5000,
+      setIsAdding(true);
+      const response = await usersService.createUser({
+        id: "",
+        username: newUsername,
+        email: newEmail,
+        role: newRole,
       });
+  
+      if (response.success && response.data) {
+        setUsers(prev => [...prev, response.data]);
+        toast.success('User added successfully with default password');
+        setIsAddDialogOpen(false);
+      } else {
+        toast.error('Failed to add user', {
+          description: response.error || 'An error occurred',
+        });
+      }
     } catch (error) {
-      toast.error('Failed to reveal password');
+      console.error('Add user error:', error);
+      toast.error('Unexpected error while adding user');
+    } finally {
+      setIsAdding(false);
     }
   };
-
-  const handleGenerateResetToken = () => {
-    if (!passwordDialogUser) return;
-
+  
+  const handleUpdateUser = async () => {
+    if (!editingUser) return;
+  
+    if (!editUsername || !editEmail || !editRole) {
+      toast.error('Please fill all fields');
+      return;
+    }
+  
+    if (!validateUsername(editUsername)) {
+      toast.error('Username must be 3-20 characters, alphanumeric or underscores only.');
+      return;
+    }
+  
+    if (!validateEmail(editEmail)) {
+      toast.error('Please enter a valid email address.');
+      return;
+    }
+  
+    if (!validRoles.includes(editRole)) {
+      toast.error('Please select a valid role.');
+      return;
+    }
+  
     try {
-      const token = generatePasswordResetToken(
-        passwordDialogUser.id,
-        currentUser.username,
-        currentUser.role
-      );
-      setResetToken(token);
-      toast.success('Password reset token generated', {
-        description: 'Token expires in 24 hours',
-        duration: 5000,
+      setIsUpdating(true);
+      const response = await usersService.updateUser(editingUser.id, {
+        username: editUsername,
+        email: editEmail,
+        role: editRole,
       });
+  
+      if (response.success && response.data) {
+        setUsers(prev => prev.map(u => (u.id === editingUser.id ? response.data : u)));
+        toast.success('User updated successfully');
+        setEditingUser(null);
+      } else {
+        toast.error('Failed to update user', {
+          description: response.error || 'An error occurred',
+        });
+      }
     } catch (error) {
-      toast.error('Failed to generate reset token');
-    }
-  };
-
-  const handleCopyToken = async () => {
-    if (!resetToken) return;
-
-    try {
-      await navigator.clipboard.writeText(resetToken.token);
-      setCopiedToken(true);
-      toast.success('Token copied to clipboard');
-      setTimeout(() => setCopiedToken(false), 2000);
-    } catch (error) {
-      toast.error('Failed to copy token');
-    }
-  };
-
-  const handleCopyResetLink = async () => {
-    if (!resetToken) return;
-
-    const resetLink = `https://yourcompany.com/reset-password?token=${resetToken.token}`;
-    try {
-      await navigator.clipboard.writeText(resetLink);
-      toast.success('Reset link copied to clipboard');
-    } catch (error) {
-      toast.error('Failed to copy reset link');
+      console.error('Update user error:', error);
+      toast.error('Unexpected error while updating user');
+    } finally {
+      setIsUpdating(false);
     }
   };
 
@@ -227,21 +306,107 @@ export function Settings() {
     setCopiedToken(false);
   };
 
+  const handleResetConfirm = async () => {
+    if (!userToReset) return;
+    setIsResetting(true);
+    try {
+      const response = await usersService.resetPwd(userToReset.id);
+      toast.success('Password Reset', {
+        description: `Password for ${userToReset.username} has been reset successfully.`,
+      });
+    } catch (error) {
+      console.error('Reset password failed:', error);
+      toast.error('Reset Failed', {
+        description: 'Unable to reset password. Please try again later.',
+      });
+    } finally {
+      setIsResetting(false);
+      setConfirmResetDialogOpen(false);
+      setUserToReset(null);
+    }
+  };
+
+  // Handle current user password change
+  const handleChangePassword = async () => {
+    // Validation
+    if (!currentPassword || !newPassword || !confirmNewPassword) {
+      toast.error('Validation Error', {
+        description: 'All password fields are required.',
+      });
+      return;
+    }
+
+    if (newPassword !== confirmNewPassword) {
+      toast.error('Validation Error', {
+        description: 'New password and confirmation do not match.',
+      });
+      return;
+    }
+
+    if (newPassword.length < 8) {
+      toast.error('Validation Error', {
+        description: 'New password must be at least 8 characters long.',
+      });
+      return;
+    }
+
+    if (newPassword === currentPassword) {
+      toast.error('Validation Error', {
+        description: 'New password must be different from current password.',
+      });
+      return;
+    }
+
+    try {
+      setIsChangingPassword(true);
+      
+      const response = await usersService.updatePwd(currentUser.id, {
+        oldPassword: currentPassword,
+        newPassword: newPassword,
+      });
+  
+      if (response.success && response.data) {
+        toast.success('Password Changed', {
+        description: 'Your password has been changed successfully.',
+      });
+      
+      // Reset form and close dialog
+      setIsChangePasswordDialogOpen(false);
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmNewPassword('');
+      setShowCurrentPassword(false);
+      setShowNewPassword(false);
+      setShowConfirmNewPassword(false);
+    }} catch (error) {
+      console.error('Failed to change password:', error);
+      toast.error('Change Failed', {
+        description: 'Failed to change password. Please verify your current password.',
+      });
+    } finally {
+      setIsChangingPassword(false);
+    }
+  }
+  ;
+
+  // Open password change dialog
+  const handleOpenChangePasswordDialog = () => {
+    setIsChangePasswordDialogOpen(true);
+    setCurrentPassword('');
+    setNewPassword('');
+    setConfirmNewPassword('');
+    setShowCurrentPassword(false);
+    setShowNewPassword(false);
+    setShowConfirmNewPassword(false);
+  };
+  
+
   return (
     <div className="p-8">
       <div className="mb-8">
         <h1 className="text-gray-900 dark:text-gray-100">Settings & Users</h1>
         <p className="text-gray-500 dark:text-gray-400 mt-1">Manage system settings and user access.</p>
       </div>
-
-      {!isAdmin && (
-        <div className="mb-4 p-4 bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg">
-          <p className="text-sm text-blue-700 dark:text-blue-400">
-            <strong>Note:</strong> User Management and Security settings are only accessible to administrators. 
-            Contact your system administrator if you need to make changes to user accounts or security settings.
-          </p>
-        </div>
-      )}
 
       <Tabs defaultValue="general" className="space-y-6">
         <TabsList className="dark:bg-gray-800">
@@ -250,9 +415,10 @@ export function Settings() {
           {isAdmin && (
             <>
               <TabsTrigger value="users" className="dark:data-[state=active]:bg-gray-700">User Management</TabsTrigger>
-              <TabsTrigger value="security" className="dark:data-[state=active]:bg-gray-700">Security</TabsTrigger>
+              
             </>
           )}
+          <><TabsTrigger value="security" className="dark:data-[state=active]:bg-gray-700">Security</TabsTrigger></>
         </TabsList>
 
         {/* General Settings */}
@@ -343,9 +509,12 @@ export function Settings() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          onClick={() => handlePasswordManagement(user)}
+                          onClick={() => {
+                            setUserToReset(user);
+                            setConfirmResetDialogOpen(true);
+                          }}
                           className="hover:bg-purple-50 dark:hover:bg-purple-900/30 hover:text-purple-600 dark:hover:text-purple-400"
-                          title="Password Management"
+                          title="Reset Password"
                         >
                           <Key className="w-4 h-4" />
                         </Button>
@@ -378,25 +547,37 @@ export function Settings() {
         </TabsContent>
         )}
 
-        {/* Security Settings - Only for Admins */}
-        {isAdmin && (
+         {/* Security Settings - Only for Admins */}
+          
           <TabsContent value="security">
           <Card className="p-6 border border-gray-200 dark:border-gray-700 dark:bg-gray-800 rounded-xl shadow-sm">
             <h3 className="text-gray-900 dark:text-gray-100 mb-4">Security Settings</h3>
             <div className="space-y-4">
-              <div className="p-4 bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-900 rounded-lg">
-                <div className="flex items-start gap-3">
-                  <Shield className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5" />
-                  <div>
-                    <h4 className="text-blue-900 dark:text-blue-300 mb-1">Password Management</h4>
+              {/* Password Change Section */}
+              <div className="mb-4 p-4 bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg">
+                <div className="flex items-start justify-between">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <Key className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                      <h4 className="text-blue-800 dark:text-blue-300">Change Password</h4>
+                    </div>
                     <p className="text-sm text-blue-700 dark:text-blue-400">
-                      Only administrators can access password management features. All password-related actions are logged for security auditing.
+                      Update your password to keep your account secure.
                     </p>
                   </div>
+                  <Button 
+                    onClick={handleOpenChangePasswordDialog}
+                    variant="outline"
+                    size="sm"
+                    className="gap-2 border-blue-300 text-blue-700 hover:bg-blue-100 dark:border-blue-700 dark:text-blue-400 dark:hover:bg-blue-900/20"
+                  >
+                    <Key className="w-4 h-4" />
+                    Change Password
+                  </Button>
                 </div>
               </div>
               
-              <div className="p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
+              {/*<div className="p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
                 <div className="flex items-center justify-between">
                   <div>
                     <Label className="dark:text-gray-200">Two-Factor Authentication</Label>
@@ -404,7 +585,7 @@ export function Settings() {
                   </div>
                   <Switch />
                 </div>
-              </div>
+                </div>*/}
 
               <div className="p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
                 <div className="flex items-center justify-between">
@@ -415,10 +596,11 @@ export function Settings() {
                   <Switch defaultChecked />
                 </div>
               </div>
+
             </div>
           </Card>
         </TabsContent>
-        )}
+        
       </Tabs>
 
       {/* Add User Dialog */}
@@ -433,30 +615,56 @@ export function Settings() {
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
               <Label htmlFor="username" className="dark:text-gray-200">Username</Label>
-              <Input id="username" placeholder="john_doe" className="bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-600 dark:text-gray-100" />
+              <Input
+                id="username"
+                placeholder="john_doe"
+                value={newUsername}
+                onChange={(e) => setNewUsername(e.target.value)}
+                className="bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-600 dark:text-gray-100"
+              />
             </div>
             <div className="grid gap-2">
               <Label htmlFor="email" className="dark:text-gray-200">Email</Label>
-              <Input id="email" type="email" placeholder="john@company.com" className="bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-600 dark:text-gray-100" />
+              <Input
+                id="email"
+                type="email"
+                placeholder="john@company.com"
+                value={newEmail}
+                onChange={(e) => setNewEmail(e.target.value)}
+                className="bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-600 dark:text-gray-100"
+              />
             </div>
             <div className="grid gap-2">
               <Label htmlFor="role" className="dark:text-gray-200">Role</Label>
-              <Select>
+              <Select
+                value={newRole}
+                onValueChange={setNewRole}
+              >
                 <SelectTrigger className="bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-600 dark:text-gray-100">
                   <SelectValue placeholder="Select role" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="Admin">Admin</SelectItem>
                   <SelectItem value="Manager">Manager</SelectItem>
-                  <SelectItem value="Agent">Agent</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsAddDialogOpen(false)} className="dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700">Cancel</Button>
-            <Button className="bg-blue-600 hover:bg-blue-700" onClick={() => setIsAddDialogOpen(false)}>
-              Create User
+            <Button
+              variant="outline"
+              onClick={() => setIsAddDialogOpen(false)}
+              className="dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+              disabled={isAdding}
+            >
+              Cancel
+            </Button>
+            <Button
+              className="bg-blue-600 hover:bg-blue-700"
+              onClick={handleAddUser}
+              disabled={isAdding}
+            >
+              {isAdding ? 'Adding...' : 'Create User'}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -475,219 +683,59 @@ export function Settings() {
             <div className="grid gap-4 py-4">
               <div className="grid gap-2">
                 <Label htmlFor="edit-username" className="dark:text-gray-200">Username</Label>
-                <Input id="edit-username" defaultValue={editingUser.username} className="bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-600 dark:text-gray-100" />
+                <Input
+                  id="edit-username"
+                  value={editUsername}
+                  onChange={(e) => setEditUsername(e.target.value)}
+                  className="bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-600 dark:text-gray-100"
+                />
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="edit-email" className="dark:text-gray-200">Email</Label>
-                <Input id="edit-email" type="email" defaultValue={editingUser.email} className="bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-600 dark:text-gray-100" />
+                <Input
+                  id="edit-email"
+                  type="email"
+                  value={editEmail}
+                  onChange={(e) => setEditEmail(e.target.value)}
+                  className="bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-600 dark:text-gray-100"
+                />
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="edit-role" className="dark:text-gray-200">Role</Label>
-                <Select defaultValue={editingUser.role}>
+                <Select
+                  value={editRole}
+                  onValueChange={setEditRole}
+                >
                   <SelectTrigger className="bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-600 dark:text-gray-100">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="Admin">Admin</SelectItem>
                     <SelectItem value="Manager">Manager</SelectItem>
-                    <SelectItem value="Agent">Agent</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setEditingUser(null)} className="dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700">Cancel</Button>
-            <Button className="bg-blue-600 hover:bg-blue-700" onClick={() => setEditingUser(null)}>
-              Save Changes
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Password Management Dialog */}
-      <Dialog open={!!passwordDialogUser} onOpenChange={() => closePasswordDialog()}>
-        <DialogContent className="sm:max-w-[600px] dark:bg-gray-800 dark:border-gray-700">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 dark:text-gray-100">
-              <Key className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-              Password Management
-            </DialogTitle>
-            <DialogDescription className="dark:text-gray-400">
-              {passwordDialogUser && `Manage password for ${passwordDialogUser.username}`}
-            </DialogDescription>
-          </DialogHeader>
-
-          {passwordDialogUser && (
-            <div className="space-y-6 py-4">
-              {/* User Info */}
-              <Card className="p-4 border border-gray-200 dark:border-gray-700 dark:bg-gray-900">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center text-purple-600 dark:text-purple-400">
-                    {passwordDialogUser.username.substring(0, 2).toUpperCase()}
-                  </div>
-                  <div>
-                    <p className="text-gray-900 dark:text-gray-100">{passwordDialogUser.username}</p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">{passwordDialogUser.email}</p>
-                  </div>
-                </div>
-              </Card>
-
-              {/* Security Warning */}
-              <div className="p-4 bg-orange-50 dark:bg-orange-950/30 border border-orange-200 dark:border-orange-900 rounded-lg">
-                <div className="flex items-start gap-3">
-                  <AlertTriangle className="w-5 h-5 text-orange-600 dark:text-orange-400 mt-0.5 flex-shrink-0" />
-                  <div>
-                    <h4 className="text-orange-900 dark:text-orange-300 mb-1">Security Notice</h4>
-                    <p className="text-sm text-orange-700 dark:text-orange-400">
-                      This action will be logged for security auditing. Only use this feature when necessary and authorized.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Password Reveal Section */}
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <Label className="dark:text-gray-200">Temporary Password Reveal</Label>
-                  {passwordRevealTimer > 0 && (
-                    <Badge className="bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400">
-                      <Clock className="w-3 h-3 mr-1" />
-                      {passwordRevealTimer}s
-                    </Badge>
-                  )}
-                </div>
-                
-                {revealedPassword ? (
-                  <div className="p-3 bg-gray-50 dark:bg-gray-900/50 rounded-lg border border-gray-200 dark:border-gray-700">
-                    <div className="flex items-center justify-between gap-2">
-                      <code className="text-sm text-gray-900 dark:text-gray-100 font-mono">
-                        {showPassword ? revealedPassword : '••••••••••••'}
-                      </code>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="dark:hover:bg-gray-700"
-                      >
-                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                      </Button>
-                    </div>
-                  </div>
-                ) : (
-                  <Button
-                    variant="outline"
-                    onClick={handleRevealPassword}
-                    className="w-full border-gray-300 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
-                  >
-                    <Eye className="w-4 h-4 mr-2" />
-                    Reveal Password (30 seconds)
-                  </Button>
-                )}
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  Password will be automatically hidden after 30 seconds for security
-                </p>
-              </div>
-
-              <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
-                <Label className="dark:text-gray-200 mb-3 block">Generate Password Reset Token</Label>
-                
-                {resetToken ? (
-                  <div className="space-y-3">
-                    <div className="p-3 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-900 rounded-lg">
-                      <div className="flex items-start gap-2 mb-2">
-                        <CheckCircle className="w-4 h-4 text-green-600 dark:text-green-400 mt-0.5" />
-                        <div className="flex-1">
-                          <p className="text-sm text-green-900 dark:text-green-300">Reset token generated successfully</p>
-                          <p className="text-xs text-green-700 dark:text-green-400 mt-1">
-                            Expires: {new Date(resetToken.expiresAt).toLocaleString()}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="p-3 bg-gray-50 dark:bg-gray-900/50 rounded-lg border border-gray-200 dark:border-gray-700">
-                      <Label className="text-xs text-gray-600 dark:text-gray-400 mb-1 block">Token</Label>
-                      <div className="flex items-center justify-between gap-2">
-                        <code className="text-xs text-gray-900 dark:text-gray-100 font-mono break-all">
-                          {resetToken.token}
-                        </code>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={handleCopyToken}
-                          className="flex-shrink-0 dark:hover:bg-gray-700"
-                        >
-                          {copiedToken ? (
-                            <CheckCircle className="w-4 h-4 text-green-600 dark:text-green-400" />
-                          ) : (
-                            <Copy className="w-4 h-4" />
-                          )}
-                        </Button>
-                      </div>
-                    </div>
-
-                    <Button
-                      variant="outline"
-                      onClick={handleCopyResetLink}
-                      className="w-full border-gray-300 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
-                    >
-                      <Copy className="w-4 h-4 mr-2" />
-                      Copy Reset Link
-                    </Button>
-                  </div>
-                ) : (
-                  <Button
-                    variant="outline"
-                    onClick={handleGenerateResetToken}
-                    className="w-full border-gray-300 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
-                  >
-                    <Key className="w-4 h-4 mr-2" />
-                    Generate Reset Token
-                  </Button>
-                )}
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                  The reset token can be sent to the user via email or other secure channel
-                </p>
-              </div>
-            </div>
-          )}
-
-          <DialogFooter>
-            <Button 
-              variant="outline" 
-              onClick={closePasswordDialog}
+            <Button
+              variant="outline"
+              onClick={() => setEditingUser(null)}
               className="dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+              disabled={isUpdating}
             >
-              Close
+              Cancel
+            </Button>
+            <Button
+              className="bg-blue-600 hover:bg-blue-700"
+              onClick={handleUpdateUser}
+              disabled={isUpdating}
+            >
+              {isUpdating ? 'Saving...' : 'Save Changes'}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
-      {/* Unauthorized Access Dialog */}
-      <AlertDialog open={isUnauthorizedDialogOpen} onOpenChange={setIsUnauthorizedDialogOpen}>
-        <AlertDialogContent className="dark:bg-gray-800 dark:border-gray-700">
-          <AlertDialogHeader>
-            <AlertDialogTitle className="flex items-center gap-2 text-red-600 dark:text-red-400">
-              <Shield className="w-5 h-5" />
-              Access Denied
-            </AlertDialogTitle>
-            <AlertDialogDescription className="dark:text-gray-400">
-              You do not have sufficient permissions to access password management features. 
-              Only administrators can view or reset user passwords.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogAction 
-              onClick={() => setIsUnauthorizedDialogOpen(false)}
-              className="bg-blue-600 hover:bg-blue-700"
-            >
-              Understood
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
 
       {/* Delete User Confirmation Dialog */}
       <ConfirmDialog
@@ -700,6 +748,142 @@ export function Settings() {
         onConfirm={handleDeleteConfirm}
         isLoading={isDeleting}
       />
+
+      <ConfirmDialog
+        open={confirmResetDialogOpen}
+        onOpenChange={setConfirmResetDialogOpen}
+        title="Reset User Password"
+        description="This will reset the user's password to default. The user will need to change it after their next login."
+        itemName={userToReset ? `${userToReset.username} (${userToReset.email})` : ''}
+        confirmText="Yes, Reset Password"
+        onConfirm={handleResetConfirm}
+        isLoading={isResetting}
+      />
+
+      {/* Change Password Dialog (for current user) */}
+      <Dialog open={isChangePasswordDialogOpen} onOpenChange={setIsChangePasswordDialogOpen}>
+        <DialogContent className="sm:max-w-[500px] dark:bg-gray-800 dark:border-gray-700">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 dark:text-gray-100">
+              <Key className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+              Change Password
+            </DialogTitle>
+            <DialogDescription className="dark:text-gray-400">
+              Enter your current password and choose a new secure password.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            {/* Current Password */}
+            <div className="space-y-2">
+              <Label htmlFor="current-password" className="dark:text-gray-200">Current Password</Label>
+              <div className="relative">
+                <Input
+                  id="current-password"
+                  type={showCurrentPassword ? 'text' : 'password'}
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  placeholder="Enter current password"
+                  className="bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-600 dark:text-gray-100 pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+                >
+                  {showCurrentPassword ? (
+                    <EyeOff className="w-4 h-4" />
+                  ) : (
+                    <Eye className="w-4 h-4" />
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {/* New Password */}
+            <div className="space-y-2">
+              <Label htmlFor="new-password" className="dark:text-gray-200">New Password</Label>
+              <div className="relative">
+                <Input
+                  id="new-password"
+                  type={showNewPassword ? 'text' : 'password'}
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="Enter new password (min. 8 characters)"
+                  className="bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-600 dark:text-gray-100 pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowNewPassword(!showNewPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+                >
+                  {showNewPassword ? (
+                    <EyeOff className="w-4 h-4" />
+                  ) : (
+                    <Eye className="w-4 h-4" />
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {/* Confirm New Password */}
+            <div className="space-y-2">
+              <Label htmlFor="confirm-new-password" className="dark:text-gray-200">Confirm New Password</Label>
+              <div className="relative">
+                <Input
+                  id="confirm-new-password"
+                  type={showConfirmNewPassword ? 'text' : 'password'}
+                  value={confirmNewPassword}
+                  onChange={(e) => setConfirmNewPassword(e.target.value)}
+                  placeholder="Confirm new password"
+                  className="bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-600 dark:text-gray-100 pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmNewPassword(!showConfirmNewPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+                >
+                  {showConfirmNewPassword ? (
+                    <EyeOff className="w-4 h-4" />
+                  ) : (
+                    <Eye className="w-4 h-4" />
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {/* Password Requirements Info */}
+            <div className="p-3 bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg">
+              <p className="text-sm text-blue-900 dark:text-blue-300 mb-2">Password requirements:</p>
+              <ul className="list-disc list-inside space-y-0.5 text-xs text-blue-700 dark:text-blue-400">
+                <li>At least 8 characters long</li>
+                <li>Different from current password</li>
+                <li>Recommended: Mix of letters, numbers, and symbols</li>
+              </ul>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIsChangePasswordDialogOpen(false)}
+              disabled={isChangingPassword}
+              className="dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              onClick={handleChangePassword}
+              disabled={isChangingPassword}
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              {isChangingPassword ? 'Changing...' : 'Change Password'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

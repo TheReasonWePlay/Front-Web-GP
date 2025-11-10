@@ -4,6 +4,7 @@
  */
 
 import { API_CONFIG } from './config';
+import { fetchWithAuth } from './fetchWithAuth';
 import type { WorkSchedule, ApiResponse } from './types';
 
 class SchedulesService {
@@ -12,14 +13,10 @@ class SchedulesService {
    */
   async getSchedules(): Promise<ApiResponse<WorkSchedule[]>> {
     try {
-      const response = await fetch(
+      const response = await fetchWithAuth(
         `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.SCHEDULES}`,
         {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('access_token') || ''}`,
-          },
+          method: 'GET'
         }
       );
       
@@ -39,14 +36,10 @@ class SchedulesService {
    */
   async getActiveSchedule(): Promise<ApiResponse<WorkSchedule | null>> {
     try {
-      const response = await fetch(
+      const response = await fetchWithAuth(
         `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.ACTIVE_SCHEDULE}`,
         {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('access_token') || ''}`,
-          },
+          method: 'GET'
         }
       );
       
@@ -66,14 +59,10 @@ class SchedulesService {
    */
   async getScheduleById(id: string): Promise<ApiResponse<WorkSchedule>> {
     try {
-      const response = await fetch(
+      const response = await fetchWithAuth(
         `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.SCHEDULE_BY_ID(id)}`,
         {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('access_token') || ''}`,
-          },
+          method: 'GET'
         }
       );
       
@@ -93,14 +82,10 @@ class SchedulesService {
    */
   async createSchedule(schedule: Omit<WorkSchedule, 'id' | 'createdAt' | 'updatedAt'>): Promise<ApiResponse<WorkSchedule>> {
     try {
-      const response = await fetch(
+      const response = await fetchWithAuth(
         `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.SCHEDULES}`,
         {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('access_token') || ''}`,
-          },
           body: JSON.stringify(schedule),
         }
       );
@@ -121,14 +106,10 @@ class SchedulesService {
    */
   async updateSchedule(id: string, updates: Partial<WorkSchedule>): Promise<ApiResponse<WorkSchedule>> {
     try {
-      const response = await fetch(
+      const response = await fetchWithAuth(
         `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.SCHEDULE_BY_ID(id)}`,
         {
           method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('access_token') || ''}`,
-          },
           body: JSON.stringify(updates),
         }
       );
@@ -149,14 +130,10 @@ class SchedulesService {
    */
   async deleteSchedule(id: string): Promise<ApiResponse<void>> {
     try {
-      const response = await fetch(
+      const response = await fetchWithAuth(
         `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.SCHEDULE_BY_ID(id)}`,
         {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('access_token') || ''}`,
-          },
+          method: 'DELETE'
         }
       );
       

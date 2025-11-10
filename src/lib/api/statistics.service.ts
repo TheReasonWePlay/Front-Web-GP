@@ -4,6 +4,7 @@
  */
 
 import { API_CONFIG } from './config';
+import { fetchWithAuth } from './fetchWithAuth';
 import type { 
   DashboardStats, 
   AttendanceStats, 
@@ -18,14 +19,10 @@ class StatisticsService {
    */
   async getDashboardStats(): Promise<ApiResponse<DashboardStats>> {
     try {
-      const response = await fetch(
+      const response = await fetchWithAuth(
         `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.DASHBOARD_STATS}`,
         {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('access_token') || ''}`,
-          },
+          method: 'GET'
         }
       );
       
@@ -57,12 +54,8 @@ class StatisticsService {
       
       const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.ATTENDANCE_STATS}${queryParams.toString() ? '?' + queryParams.toString() : ''}`;
       
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('access_token') || ''}`,
-        },
+      const response = await fetchWithAuth(url, {
+        method: 'GET'
       });
       
       if (!response.ok) {
@@ -83,12 +76,8 @@ class StatisticsService {
     try {
       const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.RECENT_ACTIVITY}?limit=${limit}`;
       
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('access_token') || ''}`,
-        },
+      const response = await fetchWithAuth(url, {
+        method: 'GET'
       });
       
       if (!response.ok) {

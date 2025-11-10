@@ -328,6 +328,7 @@ export interface WorkSchedule {
   afternoonEnd: string;
   tolerance: string;
   isActive: boolean;
+  deletable: boolean;
 }
 
 // ============================================================================
@@ -651,7 +652,12 @@ export interface SystemUser {
   id: string;
   username: string;
   email: string;
-  role: 'Admin' | 'Manager' | 'Agent';
+  role: 'Admin' | 'Manager';
+}
+
+export interface PassUpdt{
+  oldPassword: string;
+  newPassword: string;
 }
 
 /**

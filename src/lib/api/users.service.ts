@@ -4,7 +4,8 @@
  */
 
 import { API_CONFIG } from './config';
-import type { SystemUser, AuditLog, PasswordResetRequest, ApiResponse } from './types';
+import { fetchWithAuth } from './fetchWithAuth';
+import type { SystemUser, PassUpdt, PasswordResetRequest, ApiResponse } from './types';
 
 class UsersService {
   /**
@@ -12,14 +13,10 @@ class UsersService {
    */
   async getUsers(): Promise<ApiResponse<SystemUser[]>> {
     try {
-      const response = await fetch(
+      const response = await fetchWithAuth(
         `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.USERS}`,
         {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('access_token') || ''}`,
-          },
+          method: 'GET'
         }
       );
       
@@ -39,14 +36,10 @@ class UsersService {
    */
   async getUserById(id: string): Promise<ApiResponse<SystemUser>> {
     try {
-      const response = await fetch(
+      const response = await fetchWithAuth(
         `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.USER_BY_ID(id)}`,
         {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('access_token') || ''}`,
-          },
+          method: 'GET'
         }
       );
       
@@ -64,16 +57,12 @@ class UsersService {
   /**
    * Create a new user
    */
-  async createUser(user: Omit<SystemUser, 'id' | 'createdAt' | 'updatedAt'>): Promise<ApiResponse<SystemUser>> {
+  async createUser(user: SystemUser): Promise<ApiResponse<SystemUser>> {
     try {
-      const response = await fetch(
+      const response = await fetchWithAuth(
         `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.USERS}`,
         {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('access_token') || ''}`,
-          },
           body: JSON.stringify(user),
         }
       );
@@ -88,20 +77,65 @@ class UsersService {
       throw error;
     }
   }
+
+
+  /**
+   * Create a new user
+   */
+  async updatePwd(id: string, pwd: PassUpdt): Promise<ApiResponse<SystemUser>> {
+    try {
+      const response = await fetchWithAuth(
+        `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.USER_PASSWORD_UPDATE(id)}`,
+        {
+          method: 'POST',
+          body: JSON.stringify(pwd),
+        }
+      );
+      
+      if (!response.ok) {
+        throw new Error(`Failed to udpdate password: ${response.statusText}`);
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.error('Error updating password:', error);
+      throw error;
+    }
+  }
+  //USER_PASSWORD_RESET
+  async resetPwd(id: string): Promise<ApiResponse<SystemUser>> {
+    try {
+      const response = await fetchWithAuth(
+        `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.USER_PASSWORD_RESET(id)}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }, // ✅ Ajout important
+          body: JSON.stringify({}), // ✅ Envoie un objet vide plutôt qu’une chaîne
+        }
+      );
   
+      if (!response.ok) {
+        const errorText = await response.text(); // ✅ pour diagnostiquer les erreurs du backend
+        throw new Error(`Failed to reset password: ${errorText || response.statusText}`);
+      }
+  
+      const data = await response.json();
+  
+      return data;
+    } catch (error) {
+      console.error('Error resetting password:', error);
+      throw error;
+    }
+  }
   /**
    * Update an existing user
    */
   async updateUser(id: string, updates: Partial<SystemUser>): Promise<ApiResponse<SystemUser>> {
     try {
-      const response = await fetch(
+      const response = await fetchWithAuth(
         `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.USER_BY_ID(id)}`,
         {
           method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('access_token') || ''}`,
-          },
           body: JSON.stringify(updates),
         }
       );
@@ -122,14 +156,10 @@ class UsersService {
    */
   async deleteUser(id: string): Promise<ApiResponse<void>> {
     try {
-      const response = await fetch(
+      const response = await fetchWithAuth(
         `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.USER_BY_ID(id)}`,
         {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('access_token') || ''}`,
-          },
+          method: 'DELETE'
         }
       );
       
@@ -149,14 +179,10 @@ class UsersService {
    */
   async resetPassword(userId: string, request?: PasswordResetRequest): Promise<ApiResponse<{ temporaryPassword?: string }>> {
     try {
-      const response = await fetch(
+      const response = await fetchWithAuth(
         `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.USER_PASSWORD_RESET(userId)}`,
         {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('access_token') || ''}`,
-          },
           body: JSON.stringify(request || {}),
         }
       );
@@ -172,45 +198,6 @@ class UsersService {
     }
   }
   
-  /**
-   * Get audit logs
-   */
-  async getAuditLogs(params?: {
-    userId?: string;
-    action?: string;
-    from?: string;
-    to?: string;
-    limit?: number;
-  }): Promise<ApiResponse<AuditLog[]>> {
-    try {
-      const queryParams = new URLSearchParams();
-      
-      if (params?.userId) queryParams.append('userId', params.userId);
-      if (params?.action) queryParams.append('action', params.action);
-      if (params?.from) queryParams.append('from', params.from);
-      if (params?.to) queryParams.append('to', params.to);
-      if (params?.limit) queryParams.append('limit', params.limit.toString());
-      
-      const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.AUDIT_LOGS}${queryParams.toString() ? '?' + queryParams.toString() : ''}`;
-      
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('access_token') || ''}`,
-        },
-      });
-      
-      if (!response.ok) {
-        throw new Error(`Failed to fetch audit logs: ${response.statusText}`);
-      }
-      
-      return await response.json();
-    } catch (error) {
-      console.error('Error fetching audit logs:', error);
-      throw error;
-    }
-  }
 }
 
 export const usersService = new UsersService();

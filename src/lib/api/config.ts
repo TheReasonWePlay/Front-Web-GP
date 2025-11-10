@@ -251,6 +251,14 @@ export const API_CONFIG = {
      * @returns {string} Formatted endpoint path
      */
     USER_PASSWORD_RESET: (id: string) => `/users/${id}/reset-password`,
+
+    /**
+     * POST /users/:id/update-password - Update user password
+     * 
+     * @param {string} id - User unique identifier
+     * @returns {string} Formatted endpoint path
+     */
+    USER_PASSWORD_UPDATE: (id: string) => `/users/${id}/update-password`,
     
     // ========================================
     // Settings & Audit Endpoints
