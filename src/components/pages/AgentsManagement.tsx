@@ -174,7 +174,8 @@ export function AgentsManagement() {
     fetchAbsences();
   }, [viewingAgent]);
 
-  const divisions = ['all', 'IT', 'HR', 'Finance', 'Sales', 'Marketing'];
+  const divisionsDbl = ["all", ...new Set(agents.map(agent => agent.division))];
+  const divisions = [...new Set(divisionsDbl)];;
 
   const filteredAgents = agents.filter(agent => {
     const matchesSearch = agent.nom.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -278,8 +279,8 @@ export function AgentsManagement() {
         setNewAgent({
           matricule: '',
           name: '',
-          department: '',
-          position: ''
+          division: '',
+          poste: ''
         });
       }
     } catch (error) {
@@ -634,18 +635,19 @@ export function AgentsManagement() {
             </div>
             <div className="grid gap-2">
               <Label htmlFor="division" className="dark:text-gray-200">Division</Label>
-              <Select value={newAgent.division} onValueChange={(value) => setNewAgent({ ...newAgent, division: value })}>
-                <SelectTrigger className="bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-600 dark:text-gray-100">
-                  <SelectValue placeholder="Select division" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="IT">IT</SelectItem>
-                  <SelectItem value="HR">HR</SelectItem>
-                  <SelectItem value="Finance">Finance</SelectItem>
-                  <SelectItem value="Sales">Sales</SelectItem>
-                  <SelectItem value="Marketing">Marketing</SelectItem>
-                </SelectContent>
-              </Select>
+              <Input 
+                id="division"
+                list="division-options"
+                placeholder="Select or type division"
+                value={newAgent.division}
+                onChange={(e) => setNewAgent({ ...newAgent, division: e.target.value })}
+                className="bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-600 dark:text-gray-100"
+              />
+              <datalist id="division-options">
+                {divisions.map(division => (
+                    <option value={division} />
+                ))}
+              </datalist>
             </div>
             <div className="grid gap-2">
               <Label htmlFor="position" className="dark:text-gray-200">Position</Label>
@@ -697,19 +699,20 @@ export function AgentsManagement() {
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="edit-department" className="dark:text-gray-200">Department</Label>
-                <Select value={editingAgent.division} onValueChange={(value) => setEditingAgent({ ...editingAgent, division: value })}>
-                  <SelectTrigger className="bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-600 dark:text-gray-100">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="IT">IT</SelectItem>
-                    <SelectItem value="HR">HR</SelectItem>
-                    <SelectItem value="Finance">Finance</SelectItem>
-                    <SelectItem value="Sales">Sales</SelectItem>
-                    <SelectItem value="Marketing">Marketing</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Label htmlFor="division" className="dark:text-gray-200">Division</Label>
+                <Input 
+                  id="division"
+                  list="division-options"
+                  placeholder="Select or type division"
+                  value={editingAgent.division}
+                  onChange={(e) => setEditingAgent({ ...editingAgent, division: e.target.value })}
+                  className="bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-600 dark:text-gray-100"
+                />
+                <datalist id="division-options">
+                  {divisions.map(division => (
+                      <option value={division} />
+                  ))}
+                </datalist>
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="edit-position" className="dark:text-gray-200">Position</Label>

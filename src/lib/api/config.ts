@@ -107,10 +107,14 @@ export const API_CONFIG = {
      * Query params: page, pageSize, search, department, status
      */
     AGENTS: '/agents',
+
+
+
+
+    DIVISION: '/agents/division',
     
     /**
-     * GET /agents/:matricule - Get agent details by matricule
-     * PUT /agents/:matricule - Update agent information
+     * GET /agents/:matricule - Get agent details by matri agent information
      * DELETE /agents/:matricule - Delete agent
      * 
      * @param {string} matricule - Agent's unique identifier (matricule)
