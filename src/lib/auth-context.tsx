@@ -75,36 +75,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
  * - Manager: hr_manager / manager123
  * - Agent: john_smith / agent123
  */
-const mockUsersDb = [
-  {
-    id: '1',
-    username: 'admin',
-    email: 'admin@company.com',
-    role: 'Admin' as const,
-    password: 'admin123', // In production, this would be hashed on the server
-  },
-  {
-    id: '2',
-    username: 'hr_manager',
-    email: 'hr.manager@company.com',
-    role: 'Manager' as const,
-    password: 'manager123',
-  },
-  {
-    id: '3',
-    username: 'it_manager',
-    email: 'it.manager@company.com',
-    role: 'Manager' as const,
-    password: 'manager123',
-  },
-  {
-    id: '4',
-    username: 'john_smith',
-    email: 'john.smith@company.com',
-    role: 'Agent' as const,
-    password: 'agent123',
-  },
-];
+
 
 // --- Constants ---
 
@@ -135,6 +106,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // --- State Management ---
   const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [demoAccounts, setDemoAccounts] = useState([]);
+
 
   // --- Initialize Authentication State ---
   
@@ -178,7 +151,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
    *   console.error(result.error);
    * }
    */
-  const login = async (username: string, password: string): Promise<{ success: boolean; error?: string }> => {
+  const login = async (username: string, password: string, toSave: boolean): Promise<{ success: boolean; error?: string }> => {
     // --- Real API Authentication (Production) ---
     try {
       // Make POST request to login endpoint
@@ -211,6 +184,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Store session in state and localStorage
       setCurrentUser(userSession);
       localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userSession));
+
+      if(toSave){
+        const savedAccountsStr = localStorage.getItem('demoAccounts');
+        console.log("authContext savedAccountsStr:", savedAccountsStr);
+
+        // 🔹 On parse le JSON (si présent), sinon tableau vide
+        const savedAccounts = savedAccountsStr ? JSON.parse(savedAccountsStr) : [];
+        console.log("authContext savedAccounts parsed:", savedAccounts);
+
+        // 🔹 Vérifier si l’utilisateur existe déjà
+        const alreadyExists = savedAccounts.some(
+          (acc: any) => acc.email === data.data.user.email
+        );
+        console.log("already exists:", alreadyExists);
+
+        if (!alreadyExists) {
+          const updatedAccounts = [...savedAccounts, userSession];
+          console.log("updatedAccounts:", updatedAccounts);
+
+          // 🔹 Mise à jour du state + localStorage
+          setDemoAccounts(updatedAccounts);
+          localStorage.setItem('demoAccounts', JSON.stringify(updatedAccounts));
+        }
+      }
       
       // In production, also store JWT tokens for authenticated API calls
       localStorage.setItem('access_token', data.data.accessToken);
@@ -235,6 +232,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = () => {
     setCurrentUser(null);
     localStorage.removeItem(AUTH_STORAGE_KEY);
+    //localStorage.removeItem('demoAccounts');
     // In production, also clear tokens and notify backend
     // localStorage.removeItem('access_token');
     // localStorage.removeItem('refresh_token');

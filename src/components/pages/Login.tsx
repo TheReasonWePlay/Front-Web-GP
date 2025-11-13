@@ -34,6 +34,8 @@ export function Login() {
   const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [demoAccounts, setDemoAccounts] = useState([]);
+
 
   // Redirect if already authenticated to appropriate landing page
   useEffect(() => {
@@ -42,6 +44,15 @@ export function Login() {
         navigate('/', { replace: true });
     }
   }, [isAuthenticated, currentUser, navigate]);
+
+
+    useEffect(() => {
+      const savedAccounts = localStorage.getItem('demoAccounts');
+      console.log("ito", savedAccounts);
+      if (savedAccounts) {
+        setDemoAccounts(JSON.parse(savedAccounts));
+      }
+    }, []);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -55,7 +66,7 @@ export function Login() {
     setIsLoading(true);
 
     try {
-      const result = await login(username, password);
+      const result = await login(username, password, rememberMe);
       
       if (result.success) {
         toast.success('Login successful!', {
@@ -79,15 +90,8 @@ export function Login() {
     }
   };
 
-  const demoAccounts = [
-    { username: 'jdupont', password: '123456', role: 'Admin', color: 'purple' },
-    { username: 'rasoamkt', password: '123456' , role: 'Manager', color: 'blue' },
-    { username: 'rrabe', password: '123456', role: 'Agent', color: 'gray' },
-  ];
-
-  const handleDemoLogin = (username: string, password: string) => {
-    setUsername(username);
-    setPassword(password);
+  const handleDemoLogin = (email: string) => {
+    setUsername(email);
   };
 
   return (
@@ -245,6 +249,7 @@ export function Login() {
                   type="button"
                   variant="link"
                   className="text-sm text-blue-600 dark:text-blue-400 p-0 h-auto"
+                  onClick={() => toast.info("Merci de contacter les Admin")}
                 >
                   Forgot password?
                 </Button>
@@ -270,32 +275,32 @@ export function Login() {
             </form>
 
             {/* Quick login - Test accounts for development */}
-            <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+            <div className="pt-6 border-t border-gray-200 dark:border-gray-700">
               <p className="text-xs text-gray-500 dark:text-gray-400 text-center mb-3">
-                Quick Login (Click to autofill)
+                Recent Account(Click to autofill)
               </p>
               <div className="space-y-2">
                 {demoAccounts.map((account) => (
                   <button
                     key={account.username}
                     type="button"
-                    onClick={() => handleDemoLogin(account.username, account.password)}
+                    onClick={() => handleDemoLogin(account.email)}
                     className="w-full p-3 bg-gray-50 dark:bg-gray-900/50 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors text-left"
                     disabled={isLoading}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                          account.color === 'purple'
+                          account.role === 'Admin'
                             ? 'bg-purple-100 dark:bg-purple-900'
-                            : account.color === 'blue'
+                            : account.role === 'Manager'
                             ? 'bg-blue-100 dark:bg-blue-900'
                             : 'bg-gray-200 dark:bg-gray-700'
                         }`}>
                           <User className={`w-4 h-4 ${
-                            account.color === 'purple'
+                            account.role === 'Admin'
                               ? 'text-purple-600 dark:text-purple-400'
-                              : account.color === 'blue'
+                              : account.role === 'Manager'
                               ? 'text-blue-600 dark:text-blue-400'
                               : 'text-gray-600 dark:text-gray-400'
                           }`} />
@@ -304,17 +309,14 @@ export function Login() {
                           <p className="text-sm text-gray-900 dark:text-gray-100">
                             {account.username}
                           </p>
-                          <p className="text-xs text-gray-500 dark:text-gray-400">
-                            {account.password}
-                          </p>
                         </div>
                       </div>
                       <Badge
                         variant="outline"
                         className={
-                          account.color === 'purple'
+                          account.role === 'Admin'
                             ? 'bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 border-purple-200 dark:border-purple-700'
-                            : account.color === 'blue'
+                            : account.role === 'Manager'
                             ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-700'
                             : 'bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-600'
                         }

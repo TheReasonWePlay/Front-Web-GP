@@ -23,7 +23,7 @@ import React from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 // --- Context Providers ---
-import { ThemeProvider } from './lib/theme-context';
+import { ThemeProvider, useTheme } from './lib/theme-context';
 import { AuthProvider } from './lib/auth-context';
 
 // --- Route Protection Components ---
@@ -57,6 +57,12 @@ import { Toaster } from './components/ui/sonner';
  * 
  * @returns {JSX.Element} The complete application with all providers and routes
  */
+
+function ThemedToaster() {
+  const { theme } = useTheme();
+  return <Toaster theme={theme} position="top-right" richColors />;
+}
+
 export default function App() {
   return (
     // --- Theme Management Layer ---
@@ -201,7 +207,7 @@ export default function App() {
             Displays success, error, and info messages throughout the app
             Position: top-right, with colored icons
           */}
-          <Toaster position="top-right" richColors />
+          <ThemedToaster />
         </HashRouter>
       </AuthProvider>
     </ThemeProvider>
