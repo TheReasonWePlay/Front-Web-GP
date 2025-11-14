@@ -85,11 +85,12 @@ export function AgentsManagement() {
   const [confirmAbsenceDialogOpen, setConfirmAbsenceDialogOpen] = useState(false);
   const [isDeletingAbsence, setIsDeletingAbsence] = useState(false);
   
+  const [listeTypeAbsences, setListeTypeAbsences] = useState(["Congé","Autorisation d'absence","Permission","Mission", "Formation", "Repos médical"])
   // Absence Form State
   const [absenceForm, setAbsenceForm] = useState({
     startDate: '',
     endDate: '',
-    type: 'Vacation' as LongAbsence['type'],
+    type: 'Congé' as LongAbsence['type'],
     reason: '',
   });
 
@@ -320,7 +321,7 @@ export function AgentsManagement() {
       setAbsenceForm({
         startDate: '',
         endDate: '',
-        type: 'Vacation',
+        type: 'Congé',
         reason: '',
       });
     }
@@ -333,7 +334,7 @@ export function AgentsManagement() {
     setAbsenceForm({
       startDate: '',
       endDate: '',
-      type: 'Vacation',
+      type: 'Congé',
       reason: '',
     });
   };
@@ -428,16 +429,16 @@ export function AgentsManagement() {
   };
   
   // Helper function to check if time is late
-  const isLate = (actualTime?: string, scheduledTime?: string): boolean => {
+  const isLate = (actualTime?: string, scheduledTime?: string, tol?: string): boolean => {
     if (!actualTime || !scheduledTime) return false;
-    return actualTime > scheduledTime;
+    return actualTime > (scheduledTime + tol);
   };
 
   // Helper function to format time with status
-  const formatTimeWithStatus = (time?: string, scheduledTime?: string, type: 'arrival' | 'departure' = 'arrival') => {
+  const formatTimeWithStatus = (time?: string, scheduledTime?: string, type: 'arrival' | 'departure' = 'arrival', tol?: string) => {
     if (!time) return { time: 'Not recorded', status: 'absent' };
     
-    const late = type === 'arrival' ? isLate(time, scheduledTime) : false;
+    const late = type === 'arrival' ? isLate(time, scheduledTime, tol) : false;
     const early = type === 'departure' && scheduledTime ? time < scheduledTime : false;
     
     return {
@@ -457,6 +458,14 @@ export function AgentsManagement() {
     const day = String(date.getDate()).padStart(2, '0');
   
     return `${year}-${month}-${day}`; // ✅ ex: "2025-10-09"
+  }
+
+  const formatTimeToHourMinute = (time: string | null): string | null => {
+    if (!time) return time;
+  
+    const [h, m] = time.split(":");
+  
+    return `${h}h ${m}`;
   }
 
   return (
@@ -527,7 +536,6 @@ export function AgentsManagement() {
               <TableHead className="dark:text-gray-300">Name</TableHead>
               <TableHead className="dark:text-gray-300">Division</TableHead>
               <TableHead className="dark:text-gray-300">Position</TableHead>
-              <TableHead className="dark:text-gray-300">Status</TableHead>
               <TableHead className="text-right dark:text-gray-300">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -551,17 +559,6 @@ export function AgentsManagement() {
                   </Badge>
                 </TableCell>
                 <TableCell className="text-gray-600 dark:text-gray-400">{agent.poste}</TableCell>
-                <TableCell>
-                  <Badge 
-                    variant={agent.status === 'Active' ? 'default' : 'secondary'}
-                    className={agent.status === 'Active' 
-                      ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/30' 
-                      : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-                    }
-                  >
-                    {agent.status}
-                  </Badge>
-                </TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-2">
                     <Button
@@ -935,6 +932,12 @@ export function AgentsManagement() {
                         <p className="text-gray-500 dark:text-gray-400 text-center py-8">Loading attendance data...</p>
                       ) : dailyAttendance ? (
                         <>
+                        {dailyAttendance.conge ? (
+                          <div className="text-center py-8">
+                            <p className="text-gray-500 dark:text-gray-400">Agent en {dailyAttendance.type_abs}</p>
+                          </div>
+                        ) : (
+                          <>
                           {/* Attendance Summary */}
                           <div className="grid grid-cols-2 gap-4 mb-6">
                             {/* Morning Arrival */}
@@ -943,18 +946,18 @@ export function AgentsManagement() {
                                 <div>
                                   <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Morning Arrival</p>
                                   <p className="text-gray-900 dark:text-gray-100">
-                                    {dailyAttendance.morningCheckIn || 'Not recorded'}
+                                    {formatTimeToHourMinute(dailyAttendance.morningCheckIn) || 'Not recorded'}
                                   </p>
                                 </div>
                                 {dailyAttendance.morningCheckIn && (
-                                  formatTimeWithStatus(dailyAttendance.morningCheckIn, '09:00', 'arrival').status === 'late' ? (
+                                  formatTimeWithStatus(dailyAttendance.morningCheckIn, dailyAttendance.entree_matin, 'arrival', dailyAttendance.tolerance).status === 'late' ? (
                                     <AlertCircle className="w-5 h-5 text-red-500" />
                                   ) : (
                                     <CheckCircle className="w-5 h-5 text-green-500" />
                                   )
                                 )}
                               </div>
-                              {dailyAttendance.morningCheckIn && formatTimeWithStatus(dailyAttendance.morningCheckIn, '09:00', 'arrival').status === 'late' && (
+                              {dailyAttendance.morningCheckIn && formatTimeWithStatus(dailyAttendance.morningCheckIn, dailyAttendance.entree_matin, 'arrival', dailyAttendance.tolerance).status === 'late' && (
                                 <p className="text-xs text-red-600 dark:text-red-400 mt-2">Late arrival</p>
                               )}
                             </div>
@@ -965,13 +968,20 @@ export function AgentsManagement() {
                                 <div>
                                   <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Morning Departure</p>
                                   <p className="text-gray-900 dark:text-gray-100">
-                                    {dailyAttendance.morningCheckOut || 'Not recorded'}
+                                    {formatTimeToHourMinute(dailyAttendance.morningCheckOut) || 'Not recorded'}
                                   </p>
                                 </div>
                                 {dailyAttendance.morningCheckOut && (
-                                  <Clock className="w-5 h-5 text-blue-500" />
+                                  formatTimeWithStatus(dailyAttendance.morningCheckOut, dailyAttendance.sortie_matin, 'departure').status === 'early' ? (
+                                    <XCircle className="w-5 h-5 text-orange-500" />
+                                  ) : (
+                                    <CheckCircle className="w-5 h-5 text-green-500" />
+                                  )
                                 )}
                               </div>
+                              {dailyAttendance.morningCheckOut && formatTimeWithStatus(dailyAttendance.morningCheckOut, dailyAttendance.sortie_matin, 'departure').status === 'early' && (
+                                <p className="text-xs text-orange-600 dark:text-orange-400 mt-2">Early departure</p>
+                              )}
                             </div>
 
                             {/* Afternoon Arrival */}
@@ -980,13 +990,20 @@ export function AgentsManagement() {
                                 <div>
                                   <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Afternoon Arrival</p>
                                   <p className="text-gray-900 dark:text-gray-100">
-                                    {dailyAttendance.afternoonCheckIn || 'Not recorded'}
+                                    {formatTimeToHourMinute(dailyAttendance.afternoonCheckIn) || 'Not recorded'}
                                   </p>
                                 </div>
                                 {dailyAttendance.afternoonCheckIn && (
-                                  <Clock className="w-5 h-5 text-blue-500" />
+                                  formatTimeWithStatus(dailyAttendance.afternoonCheckIn, dailyAttendance.entree_aprem, 'arrival', dailyAttendance.tolerance).status === 'late' ? (
+                                    <AlertCircle className="w-5 h-5 text-red-500" />
+                                  ) : (
+                                    <CheckCircle className="w-5 h-5 text-green-500" />
+                                  )
                                 )}
                               </div>
+                              {dailyAttendance.afternoonCheckIn && formatTimeWithStatus(dailyAttendance.afternoonCheckIn, dailyAttendance.entree_aprem, 'arrival', dailyAttendance.tolerance).status === 'late' && (
+                                <p className="text-xs text-red-600 dark:text-red-400 mt-2">Late arrival</p>
+                              )}
                             </div>
 
                             {/* Afternoon Departure */}
@@ -995,18 +1012,18 @@ export function AgentsManagement() {
                                 <div>
                                   <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Afternoon Departure</p>
                                   <p className="text-gray-900 dark:text-gray-100">
-                                    {dailyAttendance.afternoonCheckOut || 'Not recorded'}
+                                    {formatTimeToHourMinute(dailyAttendance.afternoonCheckOut) || 'Not recorded'}
                                   </p>
                                 </div>
                                 {dailyAttendance.afternoonCheckOut && (
-                                  formatTimeWithStatus(dailyAttendance.afternoonCheckOut, '17:00', 'departure').status === 'early' ? (
+                                  formatTimeWithStatus(dailyAttendance.afternoonCheckOut, dailyAttendance.sortie_aprem, 'departure').status === 'early' ? (
                                     <XCircle className="w-5 h-5 text-orange-500" />
                                   ) : (
                                     <CheckCircle className="w-5 h-5 text-green-500" />
                                   )
                                 )}
                               </div>
-                              {dailyAttendance.afternoonCheckOut && formatTimeWithStatus(dailyAttendance.afternoonCheckOut, '17:00', 'departure').status === 'early' && (
+                              {dailyAttendance.afternoonCheckOut && formatTimeWithStatus(dailyAttendance.afternoonCheckOut, dailyAttendance.sortie_aprem, 'departure').status === 'early' && (
                                 <p className="text-xs text-orange-600 dark:text-orange-400 mt-2">Early departure</p>
                               )}
                             </div>
@@ -1022,7 +1039,7 @@ export function AgentsManagement() {
                                     <div className="flex items-center justify-between">
                                       <div>
                                         <p className="text-sm text-gray-900 dark:text-gray-100">
-                                          {exit.exitTime} - {exit.returnTime || 'Not returned'}
+                                          {formatTimeToHourMinute(exit.exitTime)} - {formatTimeToHourMinute(exit.returnTime) || 'Not returned'}
                                         </p>
                                         <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
                                           {exit.description}
@@ -1030,7 +1047,7 @@ export function AgentsManagement() {
                                       </div>
                                       {exit.duration && (
                                         <Badge variant="outline" className="bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400">
-                                          {exit.duration} min
+                                          {exit.duration}
                                         </Badge>
                                       )}
                                     </div>
@@ -1056,10 +1073,12 @@ export function AgentsManagement() {
                             </Badge>
                             {dailyAttendance.workHours && (
                               <p className="text-sm text-gray-600 dark:text-gray-400">
-                                • {dailyAttendance.workHours}h worked
+                                • {dailyAttendance.workHours} worked
                               </p>
                             )}
                           </div>
+                          </>
+                          )}
                         </>
                       ) : (
                         <div className="text-center py-8">
@@ -1232,14 +1251,11 @@ export function AgentsManagement() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Vacation">Vacation</SelectItem>
-                  <SelectItem value="Sick Leave">Sick Leave</SelectItem>
-                  <SelectItem value="Maternity Leave">Maternity Leave</SelectItem>
-                  <SelectItem value="Paternity Leave">Paternity Leave</SelectItem>
-                  <SelectItem value="Personal Leave">Personal Leave</SelectItem>
-                  <SelectItem value="Unpaid Leave">Unpaid Leave</SelectItem>
-                  <SelectItem value="Bereavement">Bereavement</SelectItem>
-                  <SelectItem value="Other">Other</SelectItem>
+                  {listeTypeAbsences.map((typeAbsence) => (
+                    <SelectItem key={typeAbsence} value={typeAbsence}>
+                      {typeAbsence}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>

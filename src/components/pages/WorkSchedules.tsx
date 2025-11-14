@@ -205,6 +205,14 @@ export function WorkSchedules() {
     }
   };
 
+  const formatTimeToHourMinute = (time: string | null): string | null => {
+    if (!time) return time;
+  
+    const [h, m] = time.split(":");
+  
+    return `${h}h ${m}`;
+  }
+
   return (
     <div className="p-8">
       <div className="mb-8">
@@ -253,10 +261,10 @@ export function WorkSchedules() {
                   </div>
                 </TableCell>
                 <TableCell className="text-gray-600 dark:text-gray-400">
-                  {schedule.morningStart} - {schedule.morningEnd}
+                  {formatTimeToHourMinute(schedule.morningStart)} - {formatTimeToHourMinute(schedule.morningEnd)}
                 </TableCell>
                 <TableCell className="text-gray-600 dark:text-gray-400">
-                  {schedule.afternoonStart} - {schedule.afternoonEnd}
+                  {formatTimeToHourMinute(schedule.afternoonStart)} - {formatTimeToHourMinute(schedule.afternoonEnd)}
                 </TableCell>
                 <TableCell>
                   <Badge variant="outline" className="bg-orange-50 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 border-orange-200 dark:border-orange-700">

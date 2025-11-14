@@ -313,6 +313,13 @@ const handleAddHoliday = async () => {
     return dayStatsMap[dateStr] || null;
   };
   
+  const formatTimeToHourMinute = (time: string | null): string | null => {
+    if (!time) return time;
+  
+    const [h, m] = time.split(":");
+  
+    return `${h}h ${m}`;
+  }
 
   return (
     <TooltipProvider delayDuration={300}>
@@ -726,16 +733,16 @@ const handleAddHoliday = async () => {
                                 </Badge>
                               </TableCell>
                               <TableCell className="text-gray-900 dark:text-gray-100 whitespace-nowrap">
-                                {record.checkInAM || '-'}
+                                {formatTimeToHourMinute(record.checkInAM) || '-'}
                               </TableCell>
                               <TableCell className="text-gray-900 dark:text-gray-100 whitespace-nowrap">
-                                {record.checkOutAM || '-'}
+                                {formatTimeToHourMinute(record.checkOutAM)|| '-'}
                               </TableCell>
                               <TableCell className="text-gray-900 dark:text-gray-100 whitespace-nowrap">
-                                {record.checkInPM || '-'}
+                                {formatTimeToHourMinute(record.checkInPM) || '-'}
                               </TableCell>
                               <TableCell className="text-gray-900 dark:text-gray-100 whitespace-nowrap">
-                                {record.checkOutPM || '-'}
+                                {formatTimeToHourMinute(record.checkOutPM) || '-'}
                               </TableCell>
                               <TableCell className="text-center">
                                 {record.temporaryExits && record.temporaryExits.length > 0 ? (
@@ -782,12 +789,12 @@ const handleAddHoliday = async () => {
                                 <Badge 
                                   variant="outline"
                                   className={
-                                    record.totalMissedTime && record.totalMissedTime !== '0h 0m'
+                                    (record.totalMissedTime !== '0h 0m' && record.totalMissedTime !== '0h 00m')
                                       ? 'bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-400'
                                       : 'bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400'
                                   }
                                 >
-                                  {record.totalMissedTime || '0h 0m'}
+                                  {record.totalMissedTime}
                                 </Badge>
                               </TableCell>
                             </TableRow>

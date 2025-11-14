@@ -204,8 +204,14 @@ export interface DailyAttendanceDetails {
   afternoonCheckIn?: string;
   afternoonCheckOut?: string;
   status: 'Present' | 'Absent' | 'Late' | 'Leave' | 'Half-day';
-  workHours?: number;
-  notes?: string;
+  workHours?: string;
+  entree_matin?: string;
+  sortie_matin?: string;
+  entree_aprem?: string;
+  sortie_aprem?: string;
+  tolerance?: string;
+  conge?: boolean;
+  type_abs?: string;
 }
 
 /**
@@ -270,7 +276,7 @@ export interface LongAbsence {
   matricule: string;
   startDate: string;
   endDate: string;
-  type: 'Sick Leave' | 'Vacation' | 'Maternity Leave' | 'Paternity Leave' | 'Personal Leave' | 'Unpaid Leave' | 'Bereavement' | 'Other';
+  type: string;
   reason: string;
   status?: 'Passed' | 'Active';
   duration?: number;

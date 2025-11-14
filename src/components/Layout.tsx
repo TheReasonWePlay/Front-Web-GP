@@ -94,7 +94,7 @@ const navItems: NavItem[] = [
   { path: '/agents', label: 'Agents Management', icon: Users, roles: ['Admin', 'Manager'] },
   { path: '/schedules', label: 'Work Schedules', icon: Calendar, roles: ['Admin', 'Manager'] },
   { path: '/calendar', label: 'Calendar & Holidays', icon: CalendarDays, roles: ['Admin', 'Manager'] },
-  { path: '/statistics', label: 'Statistics & Reports', icon: BarChart3, roles: ['Admin', 'Manager'] },
+  /*{ path: '/statistics', label: 'Statistics & Reports', icon: BarChart3, roles: ['Admin', 'Manager'] },*/
   { path: '/settings', label: 'Settings & Users', icon: Settings, roles: ['Admin', 'Manager'] },
 ];
 

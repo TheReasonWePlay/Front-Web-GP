@@ -116,7 +116,7 @@ export function Dashboard() {
       case 'check-in':
         return <CheckCircle2 className="w-5 h-5 text-green-600 dark:text-green-400" />;
       case 'check-out':
-        return <CheckCircle2 className="w-5 h-5 text-blue-600 dark:text-blue-400" />;
+        return <CheckCircle2 className="w-5 h-5 text-orange-600 dark:text-orange-400" />;
       case 'leave-request':
         return <XCircle className="w-5 h-5 text-red-600 dark:text-red-400" />;
       default:
@@ -277,7 +277,7 @@ export function Dashboard() {
                 <Legend />
                 <Line 
                   type="monotone" 
-                  dataKey="present" 
+                  dataKey="Taux de présence" 
                   stroke="#3b82f6" 
                   strokeWidth={3}
                   dot={{ fill: '#3b82f6', r: 5 }}
@@ -327,17 +327,13 @@ export function Dashboard() {
         <Card className="p-6 border border-gray-200 dark:border-gray-700 dark:bg-gray-800 rounded-xl shadow-sm">
           <h3 className="text-gray-900 dark:text-gray-100 mb-4">Quick Actions</h3>
           <div className="space-y-3">
-            <Button className="w-full justify-start bg-blue-600 hover:bg-blue-700 text-white rounded-lg">
-              <Plus className="w-4 h-4 mr-2" />
-              Add Schedule
-            </Button>
             <Button variant="outline" className="w-full justify-start border-gray-300 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 rounded-lg">
-              <Calendar className="w-4 h-4 mr-2" />
-              Add Holiday
+              <FileText className="w-4 h-4 mr-2" />
+              Generate Report Excel
             </Button>
             <Button variant="outline" className="w-full justify-start border-gray-300 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 rounded-lg">
               <FileText className="w-4 h-4 mr-2" />
-              Generate Report
+              Generate Report Pdf
             </Button>
           </div>
 
@@ -355,10 +351,6 @@ export function Dashboard() {
                     <TrendingUp className="w-3 h-3" />
                     {stats.attendanceRate.toFixed(1)}%
                   </span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600 dark:text-gray-400">On Leave</span>
-                  <span className="text-gray-900 dark:text-gray-100">{stats.onLeaveToday}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600 dark:text-gray-400">Avg Work Hours</span>
