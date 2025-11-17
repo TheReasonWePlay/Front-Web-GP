@@ -34,7 +34,7 @@ import { getDayStatistics, type DayStatistics } from '../../lib/api/legacy-types
 import { ConfirmDialog } from '../ConfirmDialog';
 import { toast } from 'sonner';
 
-const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const daysOfWeek = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
 const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
 export function CalendarHolidays() {
@@ -271,16 +271,16 @@ const handleAddHoliday = async () => {
       
       if (response.success) {
         setHolidays(holidays.filter(h => h.id !== holidayToDelete.id));
-        toast.success('Holiday deleted successfully', {
-          description: `${holidayToDelete.name} has been removed from the calendar.`,
+        toast.success('Jour férier supprimer avec succès', {
+          description: `${holidayToDelete.name} a été éffacer du calendrier.`,
         });
       } else {
-        toast.error('Failed to delete holiday', {
+        toast.error('Echec Suppréssion Jour férier', {
           description: response.error || 'An error occurred while deleting the holiday.',
         });
       }
     } catch (error) {
-      console.error('Failed to delete holiday:', error);
+      console.error('Echec de Suppréssion:', error);
       toast.error('Failed to delete holiday', {
         description: 'An unexpected error occurred. Please try again.',
       });
@@ -325,17 +325,17 @@ const handleAddHoliday = async () => {
     <TooltipProvider delayDuration={300}>
       <div className="p-8">
         <div className="mb-8">
-          <h1 className="text-gray-900 dark:text-gray-100">Calendar & Holidays</h1>
-          <p className="text-gray-500 dark:text-gray-400 mt-1">Manage holidays and view daily attendance statistics.</p>
+          <h1 className="text-gray-900 dark:text-gray-100">Calendrier</h1>
+          <p className="text-gray-500 dark:text-gray-400 mt-1">Gérez les jour ouvrables et consultez les statistiques de présence quotidiennes.</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Calendar */}
           <Card className="lg:col-span-2 p-6 border border-gray-200 dark:border-gray-700 dark:bg-gray-800 rounded-xl shadow-sm">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-gray-900 dark:text-gray-100">
-                {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
-              </h2>
+            <h2 className="text-gray-900 dark:text-gray-100">
+              {currentDate.toLocaleDateString('fr-FR', { month: 'long' })} {currentDate.getFullYear()}
+            </h2>
               <div className="flex gap-2">
                 <Button
                   variant="outline"
@@ -343,7 +343,7 @@ const handleAddHoliday = async () => {
                   onClick={() => changeMonth(-1)}
                   className="border-gray-300 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 rounded-lg"
                 >
-                  Previous
+                  Precédent
                 </Button>
                 <Button
                   variant="outline"
@@ -351,7 +351,7 @@ const handleAddHoliday = async () => {
                   onClick={() => changeMonth(1)}
                   className="border-gray-300 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 rounded-lg"
                 >
-                  Next
+                  Suivant
                 </Button>
               </div>
             </div>
@@ -414,7 +414,7 @@ const handleAddHoliday = async () => {
                           </p>
                           <div className="space-y-1 text-xs">
                             <div className="flex items-center justify-between gap-4">
-                              <span className="text-gray-600 dark:text-gray-400">Attendance Rate:</span>
+                              <span className="text-gray-600 dark:text-gray-400">Taux de Présence:</span>
                               <span className={`${stats.attendanceRate >= 90 ? 'text-green-600 dark:text-green-400' : 'text-orange-600 dark:text-orange-400'}`}>
                                 {stats.attendanceRate}%
                               </span>
@@ -424,7 +424,7 @@ const handleAddHoliday = async () => {
                               <span className="text-gray-900 dark:text-gray-100">{stats.present}/{stats.totalAgents}</span>
                             </div>
                             <div className="flex items-center justify-between gap-4">
-                              <span className="text-gray-600 dark:text-gray-400">Late Arrivals:</span>
+                              <span className="text-gray-600 dark:text-gray-400">En retard:</span>
                               <span className="text-gray-900 dark:text-gray-100">{stats.late}</span>
                             </div>
                             <div className="flex items-center justify-between gap-4">
@@ -433,7 +433,7 @@ const handleAddHoliday = async () => {
                             </div>
                           </div>
                           <p className="text-xs text-blue-600 dark:text-blue-400 pt-1 border-t border-gray-200 dark:border-gray-600">
-                            Click for full details
+                            Appuyer pour plus de Détails
                           </p>
                         </div>
                       </TooltipContent>
@@ -446,7 +446,7 @@ const handleAddHoliday = async () => {
             <div className="mt-6 flex items-center gap-6 pt-6 border-t border-gray-200 dark:border-gray-700">
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 bg-blue-100 dark:bg-blue-900/40 border border-blue-500 dark:border-blue-600 rounded"></div>
-                <span className="text-sm text-gray-600 dark:text-gray-400">Today</span>
+                <span className="text-sm text-gray-600 dark:text-gray-400">Aujoud'hui</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-600 rounded"></div>
@@ -454,7 +454,7 @@ const handleAddHoliday = async () => {
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700 rounded"></div>
-                <span className="text-sm text-gray-600 dark:text-gray-400">Holiday</span>
+                <span className="text-sm text-gray-600 dark:text-gray-400">Jour Férier</span>
               </div>
             </div>
           </Card>
@@ -463,14 +463,14 @@ const handleAddHoliday = async () => {
           <div className="space-y-6">
             <Card className="p-6 border border-gray-200 dark:border-gray-700 dark:bg-gray-800 rounded-xl shadow-sm">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-gray-900 dark:text-gray-100">Holidays</h3>
+                <h3 className="text-gray-900 dark:text-gray-100">Jour Férier</h3>
                 <Button
                   size="sm"
                   onClick={() => setIsAddDialogOpen(true)}
                   className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg"
                 >
                   <Plus className="w-4 h-4 mr-1" />
-                  Add
+                  Ajouter
                 </Button>
               </div>
               <div className="space-y-3 max-h-[500px] overflow-y-auto">
@@ -486,9 +486,13 @@ const handleAddHoliday = async () => {
                             year: 'numeric'
                           })}
                         </p>
-                        {holiday.recurring && (
+                        {holiday.recurring? (
                           <Badge variant="outline" className="mt-2 text-xs dark:border-gray-600 dark:text-gray-300">
-                            Recurring
+                            Recurent
+                          </Badge>
+                        ) : (
+                          <Badge variant="outline" className="mt-2 text-xs dark:border-gray-600 dark:text-gray-300">
+                            Non recurent
                           </Badge>
                         )}
                       </div>
@@ -505,7 +509,7 @@ const handleAddHoliday = async () => {
                 ))}
               </div>
             </Card>
-
+{/*
             <Card className="p-6 border border-gray-200 dark:border-gray-700 dark:bg-gray-800 rounded-xl shadow-sm">
               <h3 className="text-gray-900 dark:text-gray-100 mb-4">Import / Export</h3>
               <div className="space-y-2">
@@ -519,6 +523,7 @@ const handleAddHoliday = async () => {
                 </Button>
               </div>
             </Card>
+*/}
           </div>
         </div>
 
@@ -526,17 +531,17 @@ const handleAddHoliday = async () => {
         <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
           <DialogContent className="sm:max-w-[500px] dark:bg-gray-800 dark:border-gray-700">
             <DialogHeader>
-              <DialogTitle className="dark:text-gray-100">Add Holiday</DialogTitle>
+              <DialogTitle className="dark:text-gray-100">Ajouter Jour non ouvrables</DialogTitle>
               <DialogDescription className="dark:text-gray-400">
-                Create a new holiday or non-working day.
+                Crée un nouvel jour férier
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <div className="grid gap-2">
-                <Label htmlFor="title" className="dark:text-gray-200">Holiday Title</Label>
+                <Label htmlFor="title" className="dark:text-gray-200">Titre</Label>
                 <Input
                   id="title"
-                  placeholder="e.g., New Year's Day"
+                  placeholder="pâques, jour de l'an,.."
                   value={newHoliday.name}
                   onChange={(e) => setNewHoliday({...newHoliday, name: e.target.value})}
                   className="bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-600 dark:text-gray-100"
@@ -554,8 +559,8 @@ const handleAddHoliday = async () => {
               </div>
               <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
                 <div>
-                  <Label htmlFor="recurring" className="dark:text-gray-200">Recurring Holiday</Label>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Repeat this holiday every year</p>
+                  <Label htmlFor="recurring" className="dark:text-gray-200">Recurent</Label>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Jour férie repititif chaque année</p>
                 </div>
                 <Switch
                   id="recurring"
@@ -574,14 +579,14 @@ const handleAddHoliday = async () => {
                 }}
                 className="dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
               >
-                Cancel
+                Annulé
               </Button>
               <Button
                 className="bg-blue-600 hover:bg-blue-700"
                 onClick={handleAddHoliday}
                 disabled={isSubmittingHoliday}
               >
-                {isSubmittingHoliday ? 'Adding...' : 'Add Holiday'}
+                {isSubmittingHoliday ? 'Ajout...' : 'Ajouter Jour ferié'}
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -603,7 +608,7 @@ const handleAddHoliday = async () => {
                   })}
                 </DialogTitle>
                 <DialogDescription className="dark:text-gray-400">
-                  Detailed attendance and pointage records for this day
+                Registres détaillés de présence et de points pour cette journée
                 </DialogDescription>
               </DialogHeader>
             </div>
@@ -644,7 +649,7 @@ const handleAddHoliday = async () => {
                           <Clock className="w-5 h-5 text-orange-600 dark:text-orange-400" />
                         </div>
                         <div>
-                          <p className="text-xs text-gray-600 dark:text-gray-400">Late Arrivals</p>
+                          <p className="text-xs text-gray-600 dark:text-gray-400">En retard</p>
                           <p className="text-xl text-gray-900 dark:text-gray-100">{dayDetails.late}</p>
                         </div>
                       </div>
@@ -667,7 +672,7 @@ const handleAddHoliday = async () => {
                   <div className="grid grid-cols-2 gap-4">
                     <Card className="p-4 border border-gray-200 dark:border-gray-700 dark:bg-gray-900">
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm text-gray-600 dark:text-gray-400">Attendance Rate</span>
+                        <span className="text-sm text-gray-600 dark:text-gray-400">Taux de Présence</span>
                         <TrendingUp className={`w-4 h-4 ${dayDetails.attendanceRate >= 90 ? 'text-green-600 dark:text-green-400' : 'text-orange-600 dark:text-orange-400'}`} />
                       </div>
                       <p className="text-2xl text-gray-900 dark:text-gray-100">{dayDetails.attendanceRate}%</p>
@@ -681,7 +686,7 @@ const handleAddHoliday = async () => {
 
                     <Card className="p-4 border border-gray-200 dark:border-gray-700 dark:bg-gray-900">
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm text-gray-600 dark:text-gray-400">Punctuality Rate</span>
+                        <span className="text-sm text-gray-600 dark:text-gray-400">Taux de ponctualités</span>
                         <TrendingUp className={`w-4 h-4 ${dayDetails.punctualityRate >= 85 ? 'text-green-600 dark:text-green-400' : 'text-orange-600 dark:text-orange-400'}`} />
                       </div>
                       <p className="text-2xl text-gray-900 dark:text-gray-100">{dayDetails.punctualityRate}%</p>
@@ -697,9 +702,9 @@ const handleAddHoliday = async () => {
                   {/* Pointage Records Table */}
                   <Card className="border border-gray-200 dark:border-gray-700 dark:bg-gray-900 rounded-xl overflow-hidden">
                     <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-                      <h4 className="text-gray-900 dark:text-gray-100">Pointage Records</h4>
+                      <h4 className="text-gray-900 dark:text-gray-100">Liste Pointage</h4>
                       <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                        All check-in and check-out records for this day
+                        Toutes les entrées - sorties de ce Jour
                       </p>
                     </div>
                     <div className="overflow-x-auto">
@@ -708,12 +713,12 @@ const handleAddHoliday = async () => {
                           <TableRow className="bg-gray-50 dark:bg-gray-900/50 border-b dark:border-gray-700">
                             <TableHead className="dark:text-gray-300 whitespace-nowrap">Agent</TableHead>
                             <TableHead className="dark:text-gray-300 whitespace-nowrap">Division</TableHead>
-                            <TableHead className="dark:text-gray-300 whitespace-nowrap">Check-in AM</TableHead>
-                            <TableHead className="dark:text-gray-300 whitespace-nowrap">Check-out AM</TableHead>
-                            <TableHead className="dark:text-gray-300 whitespace-nowrap">Check-in PM</TableHead>
-                            <TableHead className="dark:text-gray-300 whitespace-nowrap">Check-out PM</TableHead>
-                            <TableHead className="dark:text-gray-300 whitespace-nowrap text-center">Number of Exits</TableHead>
-                            <TableHead className="dark:text-gray-300 whitespace-nowrap">Total Missed Time</TableHead>
+                            <TableHead className="dark:text-gray-300 whitespace-nowrap">Arrivé AM</TableHead>
+                            <TableHead className="dark:text-gray-300 whitespace-nowrap">Sortie AM</TableHead>
+                            <TableHead className="dark:text-gray-300 whitespace-nowrap">arrivé PM</TableHead>
+                            <TableHead className="dark:text-gray-300 whitespace-nowrap">Sortie PM</TableHead>
+                            <TableHead className="dark:text-gray-300 whitespace-nowrap text-center">Nombre de Sortie</TableHead>
+                            <TableHead className="dark:text-gray-300 whitespace-nowrap">Heure total manqué</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -758,7 +763,7 @@ const handleAddHoliday = async () => {
                                     >
                                       <div className="space-y-3">
                                         <p className="text-sm text-gray-900 dark:text-gray-100">
-                                          Temporary Exits on this day:
+                                          Sortie temporaire du Jour:
                                         </p>
                                         <div className="space-y-2">
                                           {record.temporaryExits.map((exit) => (
@@ -815,11 +820,11 @@ const handleAddHoliday = async () => {
                   onClick={() => setSelectedDate(null)}
                   className="dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
                 >
-                  Close
+                  Fermer
                 </Button>
                 <Button className="bg-blue-600 hover:bg-blue-700">
                   <Download className="w-4 h-4 mr-2" />
-                  Export Report
+                  Exporter rapport
                 </Button>
               </DialogFooter>
             </div>
@@ -830,10 +835,10 @@ const handleAddHoliday = async () => {
         <ConfirmDialog
           open={confirmDialogOpen}
           onOpenChange={setConfirmDialogOpen}
-          title="Delete Holiday"
-          description="Are you sure you want to delete this holiday? This will affect all work schedules and attendance calculations."
+          title="Supprimer Jour Férier"
+          description="Êtes-vous sûr de vouloir supprimer ce jour férié ? Cela affectera tous les horaires de travail et les calculs de présence."
           itemName={holidayToDelete ? `${holidayToDelete.name} (${formatLocalMD(holidayToDelete.date)})` : ''}
-          confirmText="Yes, Delete Holiday"
+          confirmText="Oui, supprimer ce Jour Férier"
           onConfirm={handleDeleteConfirm}
           isLoading={isDeleting}
         />

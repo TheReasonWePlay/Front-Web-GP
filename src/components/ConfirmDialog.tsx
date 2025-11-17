@@ -32,7 +32,7 @@
  * @module components/ConfirmDialog
  */
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -179,7 +179,7 @@ export function ConfirmDialog({
           {/* Warning Message */}
           <div className="mt-3 rounded-lg bg-red-50 dark:bg-red-950/20 p-3 border border-red-200 dark:border-red-900">
             <p className="text-sm text-red-800 dark:text-red-300">
-              ⚠️ This action cannot be undone
+              ⚠️ Cette action est irreversible
             </p>
           </div>
         </AlertDialogHeader>

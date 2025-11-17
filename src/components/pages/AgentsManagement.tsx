@@ -201,17 +201,17 @@ export function AgentsManagement() {
       
       if (response.success) {
         setAgents(agents.filter(agent => agent.matricule !== agentToDelete.matricule));
-        toast.success('Agent deleted successfully', {
-          description: `${agentToDelete.nom} has been removed from the system.`,
+        toast.success('Agent éffacé avec succès', {
+          description: `${agentToDelete.nom} a été éffacer du système.`,
         });
       } else {
-        toast.error('Failed to delete agent', {
+        toast.error("Effacement d'agent échoué", {
           description: response.error || 'An error occurred while deleting the agent.',
         });
       }
     } catch (error) {
-      console.error('Failed to delete agent:', error);
-      toast.error('Failed to delete agent', {
+      console.error("Effacement d'agent échoué:", error);
+      toast.error("Effacement d'agent échoué", {
         description: 'An unexpected error occurred. Please try again.',
       });
     } finally {
@@ -301,7 +301,7 @@ export function AgentsManagement() {
         setEditingAgent(null);
       }
     } catch (error) {
-      console.error('Failed to update agent:', error);
+      console.error("Echec mis a jour Agent:", error);
     }
   };
   
@@ -413,14 +413,14 @@ export function AgentsManagement() {
       );
       
       if (response.success) {
-        toast.success('Absence deleted successfully');
+        toast.success('Absence éffacer avec succès');
         setAbsences(absences.filter(a => a.id !== absenceToDelete.id));
       } else {
-        toast.error(response.error || 'Failed to delete absence');
+        toast.error(response.error || 'Echec effacement absence');
       }
     } catch (error) {
-      console.error('Failed to delete absence:', error);
-      toast.error('Failed to delete absence');
+      console.error('Echec effacement absence:', error);
+      toast.error('Echec effacement absence');
     } finally {
       setIsDeletingAbsence(false);
       setConfirmAbsenceDialogOpen(false);
@@ -473,18 +473,13 @@ export function AgentsManagement() {
       <div className="mb-8">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h1 className="text-gray-900 dark:text-gray-100">Agents Management</h1>
+            <h1 className="text-gray-900 dark:text-gray-100">Gestion des Agents</h1>
             <p className="text-gray-500 dark:text-gray-400 mt-1">
               {isAdmin 
                 ? 'Manage your staff members and their information.' 
                 : 'View staff members and their information.'}
             </p>
           </div>
-          {!isAdmin && (
-            <Badge variant="outline" className="bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-700 px-3 py-1">
-              View Only
-            </Badge>
-          )}
         </div>
       </div>
 
@@ -495,7 +490,7 @@ export function AgentsManagement() {
             <div className="relative flex-1 max-w-md">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-5 h-5" />
               <Input
-                placeholder="Search by name or matricule..."
+                placeholder="Recherche par Nom ou Matricule..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10 bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-600 dark:text-gray-100 rounded-lg"
@@ -509,7 +504,7 @@ export function AgentsManagement() {
               <SelectContent>
                 {divisions.map(division => (
                   <SelectItem key={division} value={division}>
-                    {division === 'all' ? 'All Divisions' : division}
+                    {division === 'all' ? 'Toutes Divisions' : division}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -521,7 +516,7 @@ export function AgentsManagement() {
               className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg w-full sm:w-auto"
             >
               <Plus className="w-4 h-4 mr-2" />
-              Add Agent
+              Nouvel Agent
             </Button>
           )}
         </div>
@@ -533,9 +528,9 @@ export function AgentsManagement() {
           <TableHeader>
             <TableRow className="bg-gray-50 dark:bg-gray-900/50 border-b dark:border-gray-700">
               <TableHead className="dark:text-gray-300">Matricule</TableHead>
-              <TableHead className="dark:text-gray-300">Name</TableHead>
+              <TableHead className="dark:text-gray-300">Nom complet</TableHead>
               <TableHead className="dark:text-gray-300">Division</TableHead>
-              <TableHead className="dark:text-gray-300">Position</TableHead>
+              <TableHead className="dark:text-gray-300">Poste</TableHead>
               <TableHead className="text-right dark:text-gray-300">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -604,9 +599,9 @@ export function AgentsManagement() {
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
         <DialogContent className="sm:max-w-[500px] dark:bg-gray-800 dark:border-gray-700">
           <DialogHeader>
-            <DialogTitle className="dark:text-gray-100">Add New Agent</DialogTitle>
+            <DialogTitle className="dark:text-gray-100">Ajouter un Agent</DialogTitle>
             <DialogDescription className="dark:text-gray-400">
-              Enter the details of the new staff member.
+              Entrer le détails du nouvel Agent
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
@@ -621,7 +616,7 @@ export function AgentsManagement() {
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="name" className="dark:text-gray-200">Full Name</Label>
+              <Label htmlFor="name" className="dark:text-gray-200">Nom Complet</Label>
               <Input 
                 id="name" 
                 placeholder="John Doe" 
@@ -647,7 +642,7 @@ export function AgentsManagement() {
               </datalist>
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="position" className="dark:text-gray-200">Position</Label>
+              <Label htmlFor="position" className="dark:text-gray-200">Poste</Label>
               <Input 
                 id="position" 
                 placeholder="Developer" 
@@ -660,7 +655,7 @@ export function AgentsManagement() {
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsAddDialogOpen(false)} className="dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700">Cancel</Button>
             <Button className="bg-blue-600 hover:bg-blue-700" onClick={handleAddAgent}>
-              Add Agent
+              Ajouter Agent
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -670,9 +665,9 @@ export function AgentsManagement() {
       <Dialog open={!!editingAgent} onOpenChange={() => setEditingAgent(null)}>
         <DialogContent className="sm:max-w-[500px] dark:bg-gray-800 dark:border-gray-700">
           <DialogHeader>
-            <DialogTitle className="dark:text-gray-100">Edit Agent</DialogTitle>
+            <DialogTitle className="dark:text-gray-100">Modifier Agent</DialogTitle>
             <DialogDescription className="dark:text-gray-400">
-              Update the agent's information.
+              Mettre a jour les informations d'un agent.
             </DialogDescription>
           </DialogHeader>
           {editingAgent && (
@@ -687,7 +682,7 @@ export function AgentsManagement() {
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="edit-name" className="dark:text-gray-200">Full Name</Label>
+                <Label htmlFor="edit-name" className="dark:text-gray-200">Nom Complet</Label>
                 <Input 
                   id="edit-name" 
                   value={editingAgent.nom}
@@ -712,7 +707,7 @@ export function AgentsManagement() {
                 </datalist>
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="edit-position" className="dark:text-gray-200">Position</Label>
+                <Label htmlFor="edit-position" className="dark:text-gray-200">Poste</Label>
                 <Input 
                   id="edit-position" 
                   value={editingAgent.poste}
@@ -725,7 +720,7 @@ export function AgentsManagement() {
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditingAgent(null)} className="dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700">Cancel</Button>
             <Button className="bg-blue-600 hover:bg-blue-700" onClick={handleUpdateAgent}>
-              Save Changes
+              Sauvegarder les Modifications
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -737,7 +732,7 @@ export function AgentsManagement() {
           {viewingAgent && (
             <>
               <SheetHeader>
-                <SheetTitle className="dark:text-gray-100">Agent Details</SheetTitle>
+                <SheetTitle className="dark:text-gray-100">Détail Agent</SheetTitle>
               </SheetHeader>
 
               <div className="mt-6 space-y-6">
@@ -766,22 +761,22 @@ export function AgentsManagement() {
                 {/* Tabs for different sections */}
                 <Tabs defaultValue="personal" className="w-full">
                   <TabsList className="grid w-full grid-cols-3 dark:bg-gray-900">
-                    <TabsTrigger value="personal" className="dark:data-[state=active]:bg-gray-700">Personal Info</TabsTrigger>
-                    <TabsTrigger value="attendance" className="dark:data-[state=active]:bg-gray-700">Attendance</TabsTrigger>
+                    <TabsTrigger value="personal" className="dark:data-[state=active]:bg-gray-700">Information Personnel</TabsTrigger>
+                    <TabsTrigger value="attendance" className="dark:data-[state=active]:bg-gray-700">Pointage</TabsTrigger>
                     <TabsTrigger value="absence" className="dark:data-[state=active]:bg-gray-700">Absence</TabsTrigger>
                   </TabsList>
 
                   {/* Personal Information Tab */}
                   <TabsContent value="personal" className="space-y-4 mt-4">
                     <Card className="p-4 border border-gray-200 dark:border-gray-700 dark:bg-gray-900">
-                      <h4 className="text-gray-900 dark:text-gray-100 mb-3">Employment Details</h4>
+                      <h4 className="text-gray-900 dark:text-gray-100 mb-3">Details de l'employé</h4>
                       <div className="space-y-3">
                         <div className="flex justify-between text-sm">
                           <span className="text-gray-600 dark:text-gray-400">Matricule:</span>
                           <span className="text-gray-900 dark:text-gray-100">{viewingAgent.matricule}</span>
                         </div>
                         <div className="flex justify-between text-sm">
-                          <span className="text-gray-600 dark:text-gray-400">Department:</span>
+                          <span className="text-gray-600 dark:text-gray-400">Division:</span>
                           <Badge variant="outline" className="bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400">
                             {viewingAgent.division}
                           </Badge>
@@ -793,7 +788,7 @@ export function AgentsManagement() {
                     <Card className="p-6 border border-gray-200 dark:border-gray-700 dark:bg-gray-900">
                       <div className="flex items-center gap-2 mb-4">
                         <QrCode className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                        <h4 className="text-gray-900 dark:text-gray-100">Agent QR Code</h4>
+                        <h4 className="text-gray-900 dark:text-gray-100">QR Code de l'agent</h4>
                       </div>
                       <div className="flex flex-col items-center gap-4">
                         {/* QR Code Display */}
@@ -899,7 +894,7 @@ export function AgentsManagement() {
                           className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-lg"
                         >
                           <Printer className="w-4 h-4 mr-2" />
-                          Print QR Code
+                          Imprimer QR Code
                         </Button>
 
                       </div>
@@ -912,7 +907,7 @@ export function AgentsManagement() {
                       <div className="flex items-center justify-between mb-6">
                         <div className="flex items-center gap-2">
                           <Clock className="w-6 h-6 text-blue-600 dark:text-blue-400" />
-                          <h4 className="text-gray-900 dark:text-gray-100">Daily Attendance Details</h4>
+                          <h4 className="text-gray-900 dark:text-gray-100">Details pointage Journalier</h4>
                         </div>
                         <Input
                           type="date"
@@ -929,7 +924,7 @@ export function AgentsManagement() {
                       </div>
 
                       {loadingAttendance ? (
-                        <p className="text-gray-500 dark:text-gray-400 text-center py-8">Loading attendance data...</p>
+                        <p className="text-gray-500 dark:text-gray-400 text-center py-8">Chargement des données...</p>
                       ) : dailyAttendance ? (
                         <>
                         {dailyAttendance.conge ? (
@@ -944,7 +939,7 @@ export function AgentsManagement() {
                             <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                               <div className="flex items-center justify-between">
                                 <div>
-                                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Morning Arrival</p>
+                                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Arrivé en matinée</p>
                                   <p className="text-gray-900 dark:text-gray-100">
                                     {formatTimeToHourMinute(dailyAttendance.morningCheckIn) || 'Not recorded'}
                                   </p>
@@ -958,7 +953,7 @@ export function AgentsManagement() {
                                 )}
                               </div>
                               {dailyAttendance.morningCheckIn && formatTimeWithStatus(dailyAttendance.morningCheckIn, dailyAttendance.entree_matin, 'arrival', dailyAttendance.tolerance).status === 'late' && (
-                                <p className="text-xs text-red-600 dark:text-red-400 mt-2">Late arrival</p>
+                                <p className="text-xs text-red-600 dark:text-red-400 mt-2">Arrivé tardive</p>
                               )}
                             </div>
 
@@ -966,7 +961,7 @@ export function AgentsManagement() {
                             <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                               <div className="flex items-center justify-between">
                                 <div>
-                                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Morning Departure</p>
+                                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Départ matinée</p>
                                   <p className="text-gray-900 dark:text-gray-100">
                                     {formatTimeToHourMinute(dailyAttendance.morningCheckOut) || 'Not recorded'}
                                   </p>
@@ -980,7 +975,7 @@ export function AgentsManagement() {
                                 )}
                               </div>
                               {dailyAttendance.morningCheckOut && formatTimeWithStatus(dailyAttendance.morningCheckOut, dailyAttendance.sortie_matin, 'departure').status === 'early' && (
-                                <p className="text-xs text-orange-600 dark:text-orange-400 mt-2">Early departure</p>
+                                <p className="text-xs text-orange-600 dark:text-orange-400 mt-2">Départ tôt</p>
                               )}
                             </div>
 
@@ -988,7 +983,7 @@ export function AgentsManagement() {
                             <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                               <div className="flex items-center justify-between">
                                 <div>
-                                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Afternoon Arrival</p>
+                                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Arrivée Après-midi</p>
                                   <p className="text-gray-900 dark:text-gray-100">
                                     {formatTimeToHourMinute(dailyAttendance.afternoonCheckIn) || 'Not recorded'}
                                   </p>
@@ -1002,7 +997,7 @@ export function AgentsManagement() {
                                 )}
                               </div>
                               {dailyAttendance.afternoonCheckIn && formatTimeWithStatus(dailyAttendance.afternoonCheckIn, dailyAttendance.entree_aprem, 'arrival', dailyAttendance.tolerance).status === 'late' && (
-                                <p className="text-xs text-red-600 dark:text-red-400 mt-2">Late arrival</p>
+                                <p className="text-xs text-red-600 dark:text-red-400 mt-2">Arrivé tardive</p>
                               )}
                             </div>
 
@@ -1010,7 +1005,7 @@ export function AgentsManagement() {
                             <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                               <div className="flex items-center justify-between">
                                 <div>
-                                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Afternoon Departure</p>
+                                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Départ Après-midi</p>
                                   <p className="text-gray-900 dark:text-gray-100">
                                     {formatTimeToHourMinute(dailyAttendance.afternoonCheckOut) || 'Not recorded'}
                                   </p>
@@ -1024,7 +1019,7 @@ export function AgentsManagement() {
                                 )}
                               </div>
                               {dailyAttendance.afternoonCheckOut && formatTimeWithStatus(dailyAttendance.afternoonCheckOut, dailyAttendance.sortie_aprem, 'departure').status === 'early' && (
-                                <p className="text-xs text-orange-600 dark:text-orange-400 mt-2">Early departure</p>
+                                <p className="text-xs text-orange-600 dark:text-orange-400 mt-2">Départ tôt</p>
                               )}
                             </div>
                           </div>
@@ -1032,7 +1027,7 @@ export function AgentsManagement() {
                           {/* Temporary Exits */}
                           {temporaryExits.length > 0 && (
                             <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
-                              <h4 className="text-gray-900 dark:text-gray-100 mb-3">Temporary Exits</h4>
+                              <h4 className="text-gray-900 dark:text-gray-100 mb-3">Sortie Temporaire(s)</h4>
                               <div className="space-y-2">
                                 {temporaryExits.map((exit) => (
                                   <div key={exit.id} className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
@@ -1069,11 +1064,14 @@ export function AgentsManagement() {
                                 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400'
                               }
                             >
-                              {dailyAttendance.status}
+                              {
+                                dailyAttendance.status === 'Late' ? 'En retard' :
+                                dailyAttendance.status 
+                              }
                             </Badge>
                             {dailyAttendance.workHours && (
                               <p className="text-sm text-gray-600 dark:text-gray-400">
-                                • {dailyAttendance.workHours} worked
+                                • {dailyAttendance.workHours} travaillé
                               </p>
                             )}
                           </div>
@@ -1082,7 +1080,7 @@ export function AgentsManagement() {
                         </>
                       ) : (
                         <div className="text-center py-8">
-                          <p className="text-gray-500 dark:text-gray-400">No attendance data for this date</p>
+                          <p className="text-gray-500 dark:text-gray-400">Aucun Pointage pour ce Jour</p>
                         </div>
                       )}
                     </Card>
@@ -1094,7 +1092,7 @@ export function AgentsManagement() {
                       <div className="flex items-center justify-between mb-6">
                         <div className="flex items-center gap-2">
                           <Calendar className="w-6 h-6 text-blue-600 dark:text-blue-400" />
-                          <h4 className="text-gray-900 dark:text-gray-100">Absence Management</h4>
+                          <h4 className="text-gray-900 dark:text-gray-100">Gestion Absence</h4>
                         </div>
                         
                           <Button
@@ -1103,22 +1101,22 @@ export function AgentsManagement() {
                             size="sm"
                           >
                             <Plus className="w-4 h-4 mr-2" />
-                            Add Absence
+                            Nouvel Absence
                           </Button>
                         
                       </div>
 
                       {loadingAbsences ? (
-                        <p className="text-gray-500 dark:text-gray-400 text-center py-8">Loading absences...</p>
+                        <p className="text-gray-500 dark:text-gray-400 text-center py-8">Chargement des absences...</p>
                       ) : absences.length > 0 ? (
                         <Table>
                           <TableHeader>
                             <TableRow>
-                              <TableHead>Start Date</TableHead>
-                              <TableHead>End Date</TableHead>
+                              <TableHead>Date de début</TableHead>
+                              <TableHead>Date de Fin</TableHead>
                               <TableHead>Type</TableHead>
-                              <TableHead>Reason</TableHead>
-                              <TableHead>Duration</TableHead>
+                              <TableHead>Raison</TableHead>
+                              <TableHead>Durée</TableHead>
                               <TableHead>Status</TableHead>
                               {isAdmin && <TableHead className="text-right">Actions</TableHead>}
                             </TableRow>
@@ -1147,7 +1145,7 @@ export function AgentsManagement() {
                                   </Badge>
                                 </TableCell>
                                 <TableCell className="max-w-xs truncate">{absence.reason}</TableCell>
-                                <TableCell>{absence.duration || 'N/A'} days</TableCell>
+                                <TableCell>{absence.duration || 'N/A'} jour(s)</TableCell>
                                 <TableCell>
                                   {absence.status && (
                                     <Badge 
@@ -1170,7 +1168,7 @@ export function AgentsManagement() {
                                         size="icon"
                                         onClick={() => handleOpenAbsenceDialog(absence)}
                                         className="hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400"
-                                        title="Edit Absence"
+                                        title="Modifié Absence"
                                       >
                                         <Pencil className="w-4 h-4" />
                                       </Button>
@@ -1179,7 +1177,7 @@ export function AgentsManagement() {
                                         size="icon"
                                         onClick={() => handleDeleteAbsenceClick(absence)}
                                         className="hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-600 dark:hover:text-red-400"
-                                        title="Delete Absence"
+                                        title="Supprimer Absence"
                                       >
                                         <Trash2 className="w-4 h-4" />
                                       </Button>
@@ -1192,7 +1190,7 @@ export function AgentsManagement() {
                         </Table>
                       ) : (
                         <div className="text-center py-8">
-                          <p className="text-gray-500 dark:text-gray-400">No absences recorded</p>
+                          <p className="text-gray-500 dark:text-gray-400">Aucun Absence enregistrer</p>
                           {isAdmin && (
                             <p className="text-sm text-gray-400 dark:text-gray-500 mt-2">Click "Add Absence" to create the first absence record</p>
                           )}
@@ -1220,7 +1218,7 @@ export function AgentsManagement() {
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
-                <Label htmlFor="startDate" className="dark:text-gray-200">Start Date</Label>
+                <Label htmlFor="startDate" className="dark:text-gray-200">Date de début</Label>
                 <Input
                   id="startDate"
                   type="date"
@@ -1230,7 +1228,7 @@ export function AgentsManagement() {
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="endDate" className="dark:text-gray-200">End Date</Label>
+                <Label htmlFor="endDate" className="dark:text-gray-200">Date de Fin</Label>
                 <Input
                   id="endDate"
                   type="date"
@@ -1261,7 +1259,7 @@ export function AgentsManagement() {
             </div>
             
             <div className="grid gap-2">
-              <Label htmlFor="reason" className="dark:text-gray-200">Reason / Motif</Label>
+              <Label htmlFor="reason" className="dark:text-gray-200">Raison / Motif</Label>
               <Textarea
                 id="reason"
                 placeholder="Enter the reason for this absence..."
@@ -1278,13 +1276,13 @@ export function AgentsManagement() {
               onClick={handleCloseAbsenceDialog}
               className="dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
             >
-              Cancel
+              Annuler
             </Button>
             <Button
               onClick={handleSaveAbsence}
               className="bg-blue-600 hover:bg-blue-700"
             >
-              {editingAbsence ? 'Update' : 'Create'} Absence
+              {editingAbsence ? 'Mettre à jour' : 'Crée'} Absence
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -1294,10 +1292,10 @@ export function AgentsManagement() {
       <ConfirmDialog
         open={confirmDialogOpen}
         onOpenChange={setConfirmDialogOpen}
-        title="Delete Agent"
-        description="Are you sure you want to delete this agent? This will permanently remove all their data including attendance records and cannot be undone."
+        title="Supprimer Agent"
+        description="Êtes-vous sûr de vouloir supprimer cet agent ? Cette action supprimera définitivement toutes ses données, y compris les enregistrements de présence, et ne pourra pas être réstauré."
         itemName={agentToDelete ? `${agentToDelete.nom} (${agentToDelete.matricule})` : ''}
-        confirmText="Yes, Delete Agent"
+        confirmText="Oui, supprimer cet Agent"
         onConfirm={handleDeleteConfirm}
         isLoading={isDeleting}
       />
@@ -1306,10 +1304,10 @@ export function AgentsManagement() {
       <ConfirmDialog
         open={confirmAbsenceDialogOpen}
         onOpenChange={setConfirmAbsenceDialogOpen}
-        title="Delete Absence"
-        description="Are you sure you want to delete this absence record? This action cannot be undone."
+        title="Supprimer Absence"
+        description="Etes vous sûr de supprimer cet Absence? Cette action est irréversible."
         itemName={absenceToDelete ? `${absenceToDelete.type} (${formatDateForInput(absenceToDelete.startDate)} - ${formatDateForInput(absenceToDelete.endDate)})` : ''}
-        confirmText="Yes, Delete Absence"
+        confirmText="Oui, supprimer cet Absence"
         onConfirm={handleDeleteAbsenceConfirm}
         isLoading={isDeletingAbsence}
       />

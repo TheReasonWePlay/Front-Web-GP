@@ -74,21 +74,21 @@ export function Dashboard() {
   // KPI configuration
   const kpiData = stats ? [
     { 
-      label: 'Present Today', 
+      label: "Present", 
       value: stats.presentToday, 
       icon: Users, 
       color: 'text-green-600 dark:text-green-400', 
       bgColor: 'bg-green-50 dark:bg-green-900/20' 
     },
     { 
-      label: 'Absent Today', 
+      label: "Absent", 
       value: stats.absentToday, 
       icon: UserX, 
       color: 'text-red-600 dark:text-red-400', 
       bgColor: 'bg-red-50 dark:bg-red-900/20' 
     },
     { 
-      label: 'Late Arrivals', 
+      label: 'En retard', 
       value: stats.lateArrivals, 
       icon: Clock, 
       color: 'text-orange-600 dark:text-orange-400', 
@@ -190,7 +190,7 @@ export function Dashboard() {
       <div className="mb-8 flex items-center justify-between">
         <div>
           <h1 className="text-gray-900 dark:text-gray-100">Dashboard</h1>
-          <p className="text-gray-500 dark:text-gray-400 mt-1">Welcome back! Here's what's happening today.</p>
+          <p className="text-gray-500 dark:text-gray-400 mt-1">Content de vous revoir, Nouveauté aujourd'hui.</p>
         </div>
         <Button 
           variant="outline" 
@@ -199,7 +199,7 @@ export function Dashboard() {
           className="dark:border-gray-600 dark:text-gray-300"
         >
           <RefreshCcw className="w-4 h-4 mr-2" />
-          Refresh
+          Rafraichir
         </Button>
       </div>
 
@@ -224,7 +224,7 @@ export function Dashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         {/* Weekly Attendance */}
         <Card className="p-6 border border-gray-200 dark:border-gray-700 dark:bg-gray-800 rounded-xl shadow-sm">
-          <h3 className="text-gray-900 dark:text-gray-100 mb-4">Weekly Attendance Overview</h3>
+          <h3 className="text-gray-900 dark:text-gray-100 mb-4">Aperçu hebdomadaire des présences</h3>
           {chartData && chartData.daily ? (
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={chartData.daily.slice(-7)}>
@@ -252,14 +252,14 @@ export function Dashboard() {
             </ResponsiveContainer>
           ) : (
             <div className="h-[300px] flex items-center justify-center text-gray-500 dark:text-gray-400">
-              No data available
+              Aucun donnée disponible
             </div>
           )}
         </Card>
 
         {/* Monthly Trend */}
         <Card className="p-6 border border-gray-200 dark:border-gray-700 dark:bg-gray-800 rounded-xl shadow-sm">
-          <h3 className="text-gray-900 dark:text-gray-100 mb-4">Monthly Attendance Trend</h3>
+          <h3 className="text-gray-900 dark:text-gray-100 mb-4">Tendances mensuelles de pointage</h3>
           {chartData && chartData.monthly ? (
             <ResponsiveContainer width="100%" height={300}>
               <LineChart data={chartData.monthly}>
@@ -286,7 +286,7 @@ export function Dashboard() {
             </ResponsiveContainer>
           ) : (
             <div className="h-[300px] flex items-center justify-center text-gray-500 dark:text-gray-400">
-              No data available
+              Aucun donnée disponible
             </div>
           )}
         </Card>
@@ -295,7 +295,7 @@ export function Dashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Recent Activities */}
         <Card className="lg:col-span-2 p-6 border border-gray-200 dark:border-gray-700 dark:bg-gray-800 rounded-xl shadow-sm">
-          <h3 className="text-gray-900 dark:text-gray-100 mb-4">Recent Activities</h3>
+          <h3 className="text-gray-900 dark:text-gray-100 mb-4">Activité Récentes</h3>
           {activities.length > 0 ? (
             <div className="space-y-4">
               {activities.map((activity) => (
@@ -318,42 +318,42 @@ export function Dashboard() {
             </div>
           ) : (
             <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-              No recent activities
+              Aucune activité récente
             </div>
           )}
         </Card>
 
         {/* Quick Actions & Summary */}
         <Card className="p-6 border border-gray-200 dark:border-gray-700 dark:bg-gray-800 rounded-xl shadow-sm">
-          <h3 className="text-gray-900 dark:text-gray-100 mb-4">Quick Actions</h3>
+          <h3 className="text-gray-900 dark:text-gray-100 mb-4">Actions rapide</h3>
           <div className="space-y-3">
             <Button variant="outline" className="w-full justify-start border-gray-300 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 rounded-lg">
               <FileText className="w-4 h-4 mr-2" />
-              Generate Report Excel
+              Generer Report Mensuel
             </Button>
             <Button variant="outline" className="w-full justify-start border-gray-300 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 rounded-lg">
               <FileText className="w-4 h-4 mr-2" />
-              Generate Report Pdf
+              Generer Report personalisé
             </Button>
           </div>
 
           {stats && (
             <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
-              <h4 className="text-sm text-gray-500 dark:text-gray-400 mb-3">Today's Summary</h4>
+              <h4 className="text-sm text-gray-500 dark:text-gray-400 mb-3">Résumé du jour</h4>
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600 dark:text-gray-400">Total Staff</span>
                   <span className="text-gray-900 dark:text-gray-100">{stats.totalAgents}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600 dark:text-gray-400">Attendance Rate</span>
+                  <span className="text-gray-600 dark:text-gray-400">Taux de présence</span>
                   <span className="text-green-600 dark:text-green-400 flex items-center gap-1">
                     <TrendingUp className="w-3 h-3" />
                     {stats.attendanceRate.toFixed(1)}%
                   </span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600 dark:text-gray-400">Avg Work Hours</span>
+                  <span className="text-gray-600 dark:text-gray-400">Heure de Travail moyenne</span>
                   <span className="text-gray-900 dark:text-gray-100">{stats.avgWorkHours.toFixed(1)}h</span>
                 </div>
               </div>

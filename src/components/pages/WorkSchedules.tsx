@@ -153,10 +153,10 @@ export function WorkSchedules() {
         setSchedules((prev) =>
           prev.map((s) => (s.id === editingSchedule.id ? response.data : s))
         );
-        toast.success('Schedule updated successfully');
+        toast.success('Horaire mis a Jour avec Succès');
         setEditingSchedule(null);
       } else {
-        toast.error('Failed to update schedule');
+        toast.error('Echec du Mis a jour');
       }
     } catch (error) {
       console.error('Error updating schedule:', error);
@@ -177,9 +177,9 @@ export function WorkSchedules() {
       const response = await schedulesService.deleteSchedule(scheduleToDelete.id);
       if (response.success) {
         setSchedules((prev) => prev.filter((s) => s.id !== scheduleToDelete.id));
-        toast.success('Schedule deleted successfully');
+        toast.success('Horaire éffacer avec Succès');
       } else {
-        toast.error('Failed to delete schedule');
+        toast.error('La suppression a échoué');
       }
     } catch (error) {
       console.error('Error deleting schedule:', error);
@@ -216,9 +216,9 @@ export function WorkSchedules() {
   return (
     <div className="p-8">
       <div className="mb-8">
-        <h1 className="text-gray-900 dark:text-gray-100">Work Schedules</h1>
+        <h1 className="text-gray-900 dark:text-gray-100">Horaires de Travail</h1>
         <p className="text-gray-500 dark:text-gray-400 mt-1">
-          Define and manage work schedules for your organization.
+          Definir et Organiser les horaires.
         </p>
       </div>
 
@@ -229,7 +229,7 @@ export function WorkSchedules() {
           className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg"
         >
           <Plus className="w-4 h-4 mr-2" />
-          Add Schedule
+          Ajouter Horaire
         </Button>
       </div>
 
@@ -238,9 +238,9 @@ export function WorkSchedules() {
         <Table>
           <TableHeader>
             <TableRow className="bg-gray-50 dark:bg-gray-900/50 border-b dark:border-gray-700">
-              <TableHead className="dark:text-gray-300">Schedule Name</TableHead>
-              <TableHead className="dark:text-gray-300">Morning Hours</TableHead>
-              <TableHead className="dark:text-gray-300">Afternoon Hours</TableHead>
+              <TableHead className="dark:text-gray-300">Titre Horaire</TableHead>
+              <TableHead className="dark:text-gray-300">Horaire Matinée</TableHead>
+              <TableHead className="dark:text-gray-300">Horaire Après-midi</TableHead>
               <TableHead className="dark:text-gray-300">Tolerance</TableHead>
               <TableHead className="dark:text-gray-300">Status</TableHead>
               <TableHead className="text-right dark:text-gray-300">Actions</TableHead>
@@ -313,15 +313,15 @@ export function WorkSchedules() {
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
         <DialogContent className="sm:max-w-[600px] dark:bg-gray-800 dark:border-gray-700">
           <DialogHeader>
-            <DialogTitle className="dark:text-gray-100">Add New Schedule</DialogTitle>
+            <DialogTitle className="dark:text-gray-100">Nouvel Horaire</DialogTitle>
             <DialogDescription className="dark:text-gray-400">
-              Create a new work schedule for your organization.
+              Crée un nouvel horaire
             </DialogDescription>
           </DialogHeader>
 
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
-              <Label htmlFor="name" className="dark:text-gray-200">Schedule Name</Label>
+              <Label htmlFor="name" className="dark:text-gray-200">Titre Horaire</Label>
               <Input
                 id="name"
                 placeholder="e.g., Standard Schedule"
@@ -333,7 +333,7 @@ export function WorkSchedules() {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
-                <Label htmlFor="morning-start" className="dark:text-gray-200">Morning Start</Label>
+                <Label htmlFor="morning-start" className="dark:text-gray-200">Heure d'arrivée Mantinal</Label>
                 <Input
                   id="morning-start"
                   type="time"
@@ -343,7 +343,7 @@ export function WorkSchedules() {
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="morning-end" className="dark:text-gray-200">Morning End</Label>
+                <Label htmlFor="morning-end" className="dark:text-gray-200">Heure sortie Mantinal</Label>
                 <Input
                   id="morning-end"
                   type="time"
@@ -356,7 +356,7 @@ export function WorkSchedules() {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
-                <Label htmlFor="afternoon-start" className="dark:text-gray-200">Afternoon Start</Label>
+                <Label htmlFor="afternoon-start" className="dark:text-gray-200">Heure d'arrivée Après-midi</Label>
                 <Input
                   id="afternoon-start"
                   type="time"
@@ -366,7 +366,7 @@ export function WorkSchedules() {
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="afternoon-end" className="dark:text-gray-200">Afternoon End</Label>
+                <Label htmlFor="afternoon-end" className="dark:text-gray-200">Heure sortie Après-midi</Label>
                 <Input
                   id="afternoon-end"
                   type="time"
@@ -391,10 +391,10 @@ export function WorkSchedules() {
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsAddDialogOpen(false)} className="dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700">
-              Cancel
+              Annulé
             </Button>
             <Button className="bg-blue-600 hover:bg-blue-700" onClick={handleCreateSchedule}>
-              Create Schedule
+              Crée horaire
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -404,16 +404,16 @@ export function WorkSchedules() {
       <Dialog open={!!editingSchedule} onOpenChange={() => setEditingSchedule(null)}>
         <DialogContent className="sm:max-w-[600px] dark:bg-gray-800 dark:border-gray-700">
           <DialogHeader>
-            <DialogTitle className="dark:text-gray-100">Edit Schedule</DialogTitle>
+            <DialogTitle className="dark:text-gray-100">Modifier Horaire</DialogTitle>
             <DialogDescription className="dark:text-gray-400">
-              Update the schedule configuration.
+              Modifié la confihuration de l'horaire
             </DialogDescription>
           </DialogHeader>
 
           {editingSchedule && (
             <div className="grid gap-4 py-4">
               <div className="grid gap-2">
-                <Label htmlFor="edit-name" className="dark:text-gray-200">Schedule Name</Label>
+                <Label htmlFor="edit-name" className="dark:text-gray-200">Titre Horaire</Label>
                 <Input
                   id="edit-name"
                   value={editingSchedule.name}
@@ -424,7 +424,7 @@ export function WorkSchedules() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">
-                  <Label className="dark:text-gray-200">Morning Start</Label>
+                  <Label className="dark:text-gray-200">Heure d'arrivée Mantinal</Label>
                   <Input
                     type="time"
                     value={editingSchedule.morningStart}
@@ -433,7 +433,7 @@ export function WorkSchedules() {
                   />
                 </div>
                 <div className="grid gap-2">
-                  <Label className="dark:text-gray-200">Morning End</Label>
+                  <Label className="dark:text-gray-200">Heure sortie Mantinal</Label>
                   <Input
                     type="time"
                     value={editingSchedule.morningEnd}
@@ -445,7 +445,7 @@ export function WorkSchedules() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">
-                  <Label className="dark:text-gray-200">Afternoon Start</Label>
+                  <Label className="dark:text-gray-200">Heure d'arrivée Après-midi</Label>
                   <Input
                     type="time"
                     value={editingSchedule.afternoonStart}
@@ -454,7 +454,7 @@ export function WorkSchedules() {
                   />
                 </div>
                 <div className="grid gap-2">
-                  <Label className="dark:text-gray-200">Afternoon End</Label>
+                  <Label className="dark:text-gray-200">Heure sortie Après-midi</Label>
                   <Input
                     type="time"
                     value={editingSchedule.afternoonEnd}
@@ -479,10 +479,10 @@ export function WorkSchedules() {
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditingSchedule(null)} className="dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700">
-              Cancel
+              Annulé
             </Button>
             <Button className="bg-blue-600 hover:bg-blue-700" onClick={handleSaveChanges}>
-              Save Changes
+              Sauvegarder les Changements
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -492,10 +492,10 @@ export function WorkSchedules() {
       <ConfirmDialog
         open={confirmDialogOpen}
         onOpenChange={setConfirmDialogOpen}
-        title="Delete Work Schedule"
-        description="Deleting this schedule will affect all agents currently assigned to it."
+        title="Supprimer Horaire de Travail"
+        description="Etes vous sûr de vouloir supprimer cette Horaire"
         itemName={scheduleToDelete?.name || ''}
-        confirmText="Yes, Delete Schedule"
+        confirmText="Oui supprimer cet Horaire"
         onConfirm={handleDeleteConfirm}
         isLoading={isDeleting}
       />

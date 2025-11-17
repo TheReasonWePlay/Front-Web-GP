@@ -404,27 +404,27 @@ const [isResetting, setIsResetting] = useState(false);
   return (
     <div className="p-8">
       <div className="mb-8">
-        <h1 className="text-gray-900 dark:text-gray-100">Settings & Users</h1>
-        <p className="text-gray-500 dark:text-gray-400 mt-1">Manage system settings and user access.</p>
+        <h1 className="text-gray-900 dark:text-gray-100">Paramètres et Utilisateurs</h1>
+        <p className="text-gray-500 dark:text-gray-400 mt-1">Gérer les paramètres du système et les comptes utilisateurs</p>
       </div>
 
       <Tabs defaultValue="general" className="space-y-6">
         <TabsList className="dark:bg-gray-800">
-          <TabsTrigger value="general" className="dark:data-[state=active]:bg-gray-700">General</TabsTrigger>
+          <TabsTrigger value="general" className="dark:data-[state=active]:bg-gray-700">Géneral</TabsTrigger>
           {/* Only show User Management and Security tabs for Admins */}
           {isAdmin && (
             <>
-              <TabsTrigger value="users" className="dark:data-[state=active]:bg-gray-700">User Management</TabsTrigger>
+              <TabsTrigger value="users" className="dark:data-[state=active]:bg-gray-700">Gestion Utilisateur</TabsTrigger>
               
             </>
           )}
-          <><TabsTrigger value="security" className="dark:data-[state=active]:bg-gray-700">Security</TabsTrigger></>
+          <><TabsTrigger value="security" className="dark:data-[state=active]:bg-gray-700">Securité</TabsTrigger></>
         </TabsList>
 
         {/* General Settings */}
         <TabsContent value="general">
           <Card className="p-6 border border-gray-200 dark:border-gray-700 dark:bg-gray-800 rounded-xl shadow-sm">
-            <h3 className="text-gray-900 dark:text-gray-100 mb-4">Appearance</h3>
+            <h3 className="text-gray-900 dark:text-gray-100 mb-4">Apparence</h3>
             <div className="space-y-4">
               <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
                 <div className="flex items-center gap-3">
@@ -434,9 +434,9 @@ const [isResetting, setIsResetting] = useState(false);
                     <Sun className="w-5 h-5 text-blue-600" />
                   )}
                   <div>
-                    <Label className="dark:text-gray-200">Dark Mode</Label>
+                    <Label className="dark:text-gray-200">Mode Sombre</Label>
                     <p className="text-sm text-gray-500 dark:text-gray-400">
-                      {theme === 'dark' ? 'Dark theme is enabled' : 'Switch to dark theme'}
+                      {theme === 'dark' ? 'Mode sombre actif' : 'Changer en Thème Sombre'}
                     </p>
                   </div>
                 </div>
@@ -453,9 +453,9 @@ const [isResetting, setIsResetting] = useState(false);
             <div className="p-6 border-b border-gray-200 dark:border-gray-700">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-gray-900 dark:text-gray-100">Users</h3>
+                  <h3 className="text-gray-900 dark:text-gray-100">Utilisateurs</h3>
                   <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                    Manage user accounts and permissions
+                    Gérer les comptes et les Permissions
                   </p>
                 </div>
                 <Button 
@@ -463,7 +463,7 @@ const [isResetting, setIsResetting] = useState(false);
                   className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg"
                 >
                   <Plus className="w-4 h-4 mr-2" />
-                  Add User
+                  Ajouter Utilisateur
                 </Button>
               </div>
             </div>
@@ -473,7 +473,7 @@ const [isResetting, setIsResetting] = useState(false);
                 <TableRow className="bg-gray-50 dark:bg-gray-900/50 border-b dark:border-gray-700">
                   <TableHead className="dark:text-gray-300">Username</TableHead>
                   <TableHead className="dark:text-gray-300">Email</TableHead>
-                  <TableHead className="dark:text-gray-300">Role</TableHead>
+                  <TableHead className="dark:text-gray-300">Rôle</TableHead>
                   <TableHead className="text-right dark:text-gray-300">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -551,7 +551,7 @@ const [isResetting, setIsResetting] = useState(false);
           
           <TabsContent value="security">
           <Card className="p-6 border border-gray-200 dark:border-gray-700 dark:bg-gray-800 rounded-xl shadow-sm">
-            <h3 className="text-gray-900 dark:text-gray-100 mb-4">Security Settings</h3>
+            <h3 className="text-gray-900 dark:text-gray-100 mb-4">Paramètres de Sécurité</h3>
             <div className="space-y-4">
               {/* Password Change Section */}
               <div className="mb-4 p-4 bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg">
@@ -559,10 +559,10 @@ const [isResetting, setIsResetting] = useState(false);
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
                       <Key className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                      <h4 className="text-blue-800 dark:text-blue-300">Change Password</h4>
+                      <h4 className="text-blue-800 dark:text-blue-300">Modifier mot de Passe</h4>
                     </div>
                     <p className="text-sm text-blue-700 dark:text-blue-400">
-                      Update your password to keep your account secure.
+                    Mettez à jour votre mot de passe pour sécuriser votre compte.
                     </p>
                   </div>
                   <Button 
@@ -572,7 +572,7 @@ const [isResetting, setIsResetting] = useState(false);
                     className="gap-2 border-blue-300 text-blue-700 hover:bg-blue-100 dark:border-blue-700 dark:text-blue-400 dark:hover:bg-blue-900/20"
                   >
                     <Key className="w-4 h-4" />
-                    Change Password
+                    Modifié mot de Passe
                   </Button>
                 </div>
               </div>
@@ -590,8 +590,8 @@ const [isResetting, setIsResetting] = useState(false);
               <div className="p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
                 <div className="flex items-center justify-between">
                   <div>
-                    <Label className="dark:text-gray-200">Session Timeout</Label>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Auto logout after 30 minutes of inactivity</p>
+                    <Label className="dark:text-gray-200">Session Expiré</Label>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Se déconnecter automatiquement après 30min d'inactivité</p>
                   </div>
                   <Switch defaultChecked />
                 </div>
@@ -607,9 +607,9 @@ const [isResetting, setIsResetting] = useState(false);
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
         <DialogContent className="sm:max-w-[500px] dark:bg-gray-800 dark:border-gray-700">
           <DialogHeader>
-            <DialogTitle className="dark:text-gray-100">Add New User</DialogTitle>
+            <DialogTitle className="dark:text-gray-100">Ajouter un nouvel Utilisateur</DialogTitle>
             <DialogDescription className="dark:text-gray-400">
-              Create a new user account with specific role and permissions.
+            Créez un nouveau compte utilisateur avec un rôle et des autorisations spécifiques.
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
@@ -635,7 +635,7 @@ const [isResetting, setIsResetting] = useState(false);
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="role" className="dark:text-gray-200">Role</Label>
+              <Label htmlFor="role" className="dark:text-gray-200">Rôle</Label>
               <Select
                 value={newRole}
                 onValueChange={setNewRole}
@@ -657,14 +657,14 @@ const [isResetting, setIsResetting] = useState(false);
               className="dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
               disabled={isAdding}
             >
-              Cancel
+              Annulé
             </Button>
             <Button
               className="bg-blue-600 hover:bg-blue-700"
               onClick={handleAddUser}
               disabled={isAdding}
             >
-              {isAdding ? 'Adding...' : 'Create User'}
+              {isAdding ? 'Ajout...' : 'Crée utilisateur'}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -674,9 +674,9 @@ const [isResetting, setIsResetting] = useState(false);
       <Dialog open={!!editingUser} onOpenChange={() => setEditingUser(null)}>
         <DialogContent className="sm:max-w-[500px] dark:bg-gray-800 dark:border-gray-700">
           <DialogHeader>
-            <DialogTitle className="dark:text-gray-100">Edit User</DialogTitle>
+            <DialogTitle className="dark:text-gray-100">Modifier Utilisateur</DialogTitle>
             <DialogDescription className="dark:text-gray-400">
-              Update user information and permissions.
+              Update les Informations et Permissions Utilisateurs.
             </DialogDescription>
           </DialogHeader>
           {editingUser && (
@@ -701,7 +701,7 @@ const [isResetting, setIsResetting] = useState(false);
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="edit-role" className="dark:text-gray-200">Role</Label>
+                <Label htmlFor="edit-role" className="dark:text-gray-200">Rôle</Label>
                 <Select
                   value={editRole}
                   onValueChange={setEditRole}
@@ -724,14 +724,14 @@ const [isResetting, setIsResetting] = useState(false);
               className="dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
               disabled={isUpdating}
             >
-              Cancel
+              Annulé
             </Button>
             <Button
               className="bg-blue-600 hover:bg-blue-700"
               onClick={handleUpdateUser}
               disabled={isUpdating}
             >
-              {isUpdating ? 'Saving...' : 'Save Changes'}
+              {isUpdating ? 'Sauvegarde en cours..' : 'Savegarder les Changements'}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -742,9 +742,9 @@ const [isResetting, setIsResetting] = useState(false);
         open={confirmDialogOpen}
         onOpenChange={setConfirmDialogOpen}
         title="Delete User Account"
-        description="This will permanently delete the user account and revoke all access. The user will no longer be able to log in. This action cannot be undone."
+        description="Cette action supprimera définitivement le compte utilisateur et révoquera tous ses accès. L'utilisateur ne pourra plus se connecter. Cette action est irréversible."
         itemName={userToDelete ? `${userToDelete.username} (${userToDelete.email})` : ''}
-        confirmText="Yes, Delete User"
+        confirmText="Oui, supprimer cet Utilisateurs"
         onConfirm={handleDeleteConfirm}
         isLoading={isDeleting}
       />
@@ -753,9 +753,9 @@ const [isResetting, setIsResetting] = useState(false);
         open={confirmResetDialogOpen}
         onOpenChange={setConfirmResetDialogOpen}
         title="Reset User Password"
-        description="This will reset the user's password to default. The user will need to change it after their next login."
+        description="Cette action réinitialisera le mot de passe de l'utilisateur à sa valeur par défaut. L'utilisateur devra le modifier lors de sa prochaine connexion."
         itemName={userToReset ? `${userToReset.username} (${userToReset.email})` : ''}
-        confirmText="Yes, Reset Password"
+        confirmText="Oui, restaurer mot de passe"
         onConfirm={handleResetConfirm}
         isLoading={isResetting}
       />
@@ -766,21 +766,21 @@ const [isResetting, setIsResetting] = useState(false);
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 dark:text-gray-100">
               <Key className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-              Change Password
+              Modifié Mot de Passe
             </DialogTitle>
             <DialogDescription className="dark:text-gray-400">
-              Enter your current password and choose a new secure password.
+            Saisissez votre mot de passe actuel et choisissez un nouveau mot de passe sécurisé.
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 py-4">
             {/* Current Password */}
             <div className="space-y-2">
-              <Label htmlFor="current-password" className="dark:text-gray-200">Current Password</Label>
+              <Label htmlFor="current-password" className="dark:text-gray-200">Mot de Passe Actuel</Label>
               <div className="relative">
                 <Input
                   id="current-password"
-                  type={showCurrentPassword ? 'text' : 'password'}
+                  type={showCurrentPassword ? 'text' : 'Mot de Passe'}
                   value={currentPassword}
                   onChange={(e) => setCurrentPassword(e.target.value)}
                   placeholder="Enter current password"
@@ -802,11 +802,11 @@ const [isResetting, setIsResetting] = useState(false);
 
             {/* New Password */}
             <div className="space-y-2">
-              <Label htmlFor="new-password" className="dark:text-gray-200">New Password</Label>
+              <Label htmlFor="new-password" className="dark:text-gray-200">Nouveau Mot de Passe</Label>
               <div className="relative">
                 <Input
                   id="new-password"
-                  type={showNewPassword ? 'text' : 'password'}
+                  type={showNewPassword ? 'text' : 'Mot de Passe'}
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   placeholder="Enter new password (min. 8 characters)"
@@ -828,11 +828,11 @@ const [isResetting, setIsResetting] = useState(false);
 
             {/* Confirm New Password */}
             <div className="space-y-2">
-              <Label htmlFor="confirm-new-password" className="dark:text-gray-200">Confirm New Password</Label>
+              <Label htmlFor="confirm-new-password" className="dark:text-gray-200">Confirmer nouveau Mot de Passe</Label>
               <div className="relative">
                 <Input
                   id="confirm-new-password"
-                  type={showConfirmNewPassword ? 'text' : 'password'}
+                  type={showConfirmNewPassword ? 'text' : 'Mot de Passe'}
                   value={confirmNewPassword}
                   onChange={(e) => setConfirmNewPassword(e.target.value)}
                   placeholder="Confirm new password"
@@ -854,11 +854,11 @@ const [isResetting, setIsResetting] = useState(false);
 
             {/* Password Requirements Info */}
             <div className="p-3 bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg">
-              <p className="text-sm text-blue-900 dark:text-blue-300 mb-2">Password requirements:</p>
+              <p className="text-sm text-blue-900 dark:text-blue-300 mb-2">Exigences de mot de passe:</p>
               <ul className="list-disc list-inside space-y-0.5 text-xs text-blue-700 dark:text-blue-400">
-                <li>At least 8 characters long</li>
-                <li>Different from current password</li>
-                <li>Recommended: Mix of letters, numbers, and symbols</li>
+                <li>Au moins 8 caractères</li>
+                <li>Different du Mot de Passe Actuel</li>
+                <li>Recommandé : un mélange de lettres, de chiffres et de symboles</li>
               </ul>
             </div>
           </div>
@@ -871,7 +871,7 @@ const [isResetting, setIsResetting] = useState(false);
               disabled={isChangingPassword}
               className="dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
             >
-              Cancel
+              Annulé
             </Button>
             <Button
               type="button"
@@ -879,7 +879,7 @@ const [isResetting, setIsResetting] = useState(false);
               disabled={isChangingPassword}
               className="bg-blue-600 hover:bg-blue-700 text-white"
             >
-              {isChangingPassword ? 'Changing...' : 'Change Password'}
+              {isChangingPassword ? 'Changement...' : 'Changeer Mot de Passe'}
             </Button>
           </DialogFooter>
         </DialogContent>

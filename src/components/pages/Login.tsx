@@ -59,7 +59,7 @@ export function Login() {
     setError('');
 
     if (!username || !password) {
-      setError('Please enter both username and password');
+      setError("Merci d'entrer le nom d'utilisateur et le mot de passe");
       return;
     }
 
@@ -69,15 +69,15 @@ export function Login() {
       const result = await login(username, password, rememberMe);
       
       if (result.success) {
-        toast.success('Login successful!', {
-          description: 'Welcome back to Staff Attendance Management',
+        toast.success('Connexion Réussi', {
+          description: 'Bienvenu sur la Gestion de Pointage du SRB HM',
           icon: <CheckCircle className="w-4 h-4" />,
         });
         // Navigation will be handled by the useEffect hook above
         // which will redirect based on user role
       } else {
         setError(result.error || 'Login failed');
-        toast.error('Login failed', {
+        toast.error('Connexion échoué', {
           description: result.error || 'Invalid credentials',
           icon: <AlertCircle className="w-4 h-4" />,
         });
@@ -126,20 +126,20 @@ export function Login() {
                 <Clock className="w-8 h-8 text-white" />
               </div>
               <div>
-                <h1 className="text-gray-900 dark:text-gray-100">Staff Attendance</h1>
-                <p className="text-gray-600 dark:text-gray-400">Management System</p>
+                <h1 className="text-gray-900 dark:text-gray-100">Gestion de Pointage</h1>
+                <p className="text-gray-600 dark:text-gray-400">des Agents Publiques</p>
               </div>
             </div>
           </div>
 
           <Card className="p-6 bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border-gray-200 dark:border-gray-700">
-            <h3 className="text-gray-900 dark:text-gray-100 mb-4">Key Features</h3>
+            <h3 className="text-gray-900 dark:text-gray-100 mb-4">Fonctionnalité</h3>
             <div className="space-y-3">
               {[
-                'Real-time attendance tracking',
-                'Comprehensive reporting & analytics',
-                'Role-based access control',
-                'Holiday & schedule management',
+                'Suivi des présences en temps réel',
+                'Rapports et analyses complets',
+                "Contrôle d'accès basé sur les rôles",
+                'Gestion des absences et calendrier',
               ].map((feature, index) => (
                 <div key={index} className="flex items-center gap-3">
                   <div className="w-5 h-5 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center flex-shrink-0">
@@ -155,9 +155,9 @@ export function Login() {
             <div className="flex items-start gap-3">
               <Shield className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5" />
               <div>
-                <h4 className="text-blue-900 dark:text-blue-300 mb-1">Secure & Reliable</h4>
+                <h4 className="text-blue-900 dark:text-blue-300 mb-1">Sécurité & Fiabilité </h4>
                 <p className="text-sm text-blue-700 dark:text-blue-400">
-                  Enterprise-grade security with encrypted data storage and audit logging
+                  Sécurité de niveau entreprise avec stockage de données chiffré
                 </p>
               </div>
             </div>
@@ -171,9 +171,9 @@ export function Login() {
               <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 dark:bg-blue-900 rounded-2xl mb-4">
                 <LogIn className="w-8 h-8 text-blue-600 dark:text-blue-400" />
               </div>
-              <h2 className="text-gray-900 dark:text-gray-100 mb-2">Welcome Back</h2>
+              <h2 className="text-gray-900 dark:text-gray-100 mb-2">Content de vous revoir</h2>
               <p className="text-gray-600 dark:text-gray-400">
-                Sign in to access your dashboard
+                Connectez-vous pour accéder à votre tableau de bord
               </p>
             </div>
 
@@ -186,13 +186,13 @@ export function Login() {
               )}
 
               <div className="space-y-2">
-                <Label htmlFor="username" className="dark:text-gray-200">Username</Label>
+                <Label htmlFor="username" className="dark:text-gray-200">Nom d'utilisateur</Label>
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
                   <Input
                     id="username"
                     type="text"
-                    placeholder="Enter your username"
+                    placeholder="Entrer votre Nom d'utilisateur"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     className="pl-10 bg-gray-50 dark:bg-gray-900 border-gray-300 dark:border-gray-600 dark:text-gray-100"
@@ -203,13 +203,13 @@ export function Login() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password" className="dark:text-gray-200">Password</Label>
+                <Label htmlFor="password" className="dark:text-gray-200">Mot de Passe</Label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
                   <Input
                     id="password"
                     type={showPassword ? 'text' : 'password'}
-                    placeholder="Enter your password"
+                    placeholder="Entrer votre Mot de Passe"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     className="pl-10 pr-10 bg-gray-50 dark:bg-gray-900 border-gray-300 dark:border-gray-600 dark:text-gray-100"
@@ -242,7 +242,7 @@ export function Login() {
                     htmlFor="remember"
                     className="text-sm text-gray-600 dark:text-gray-400 cursor-pointer"
                   >
-                    Remember me
+                    Se souvenir de Moi
                   </Label>
                 </div>
                 <Button
@@ -251,7 +251,7 @@ export function Login() {
                   className="text-sm text-blue-600 dark:text-blue-400 p-0 h-auto"
                   onClick={() => toast.info("Merci de contacter les Admin")}
                 >
-                  Forgot password?
+                  Mot de Passe oublié?
                 </Button>
               </div>
 
@@ -263,12 +263,12 @@ export function Login() {
                 {isLoading ? (
                   <>
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-                    Signing in...
+                    Conection...
                   </>
                 ) : (
                   <>
                     <LogIn className="w-4 h-4 mr-2" />
-                    Sign In
+                    Se Connecter
                   </>
                 )}
               </Button>
@@ -277,7 +277,7 @@ export function Login() {
             {/* Quick login - Test accounts for development */}
             <div className="pt-6 border-t border-gray-200 dark:border-gray-700">
               <p className="text-xs text-gray-500 dark:text-gray-400 text-center mb-3">
-                Recent Account(Click to autofill)
+                Compte récent(Auto-complétion)
               </p>
               <div className="space-y-2">
                 {demoAccounts.map((account) => (
@@ -332,7 +332,7 @@ export function Login() {
           </Card>
 
           <p className="text-center text-xs text-gray-500 dark:text-gray-400 mt-6">
-            © 2025 Staff Attendance Management System. All rights reserved.
+            © 2025 Gestion de Pointage SRB HM. Tout droit réserver.
           </p>
         </div>
       </div>

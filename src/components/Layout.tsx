@@ -91,11 +91,11 @@ type NavItem = {
  */
 const navItems: NavItem[] = [
   { path: '/', label: 'Dashboard', icon: LayoutDashboard, roles: ['Admin', 'Manager'] },
-  { path: '/agents', label: 'Agents Management', icon: Users, roles: ['Admin', 'Manager'] },
-  { path: '/schedules', label: 'Work Schedules', icon: Calendar, roles: ['Admin', 'Manager'] },
-  { path: '/calendar', label: 'Calendar & Holidays', icon: CalendarDays, roles: ['Admin', 'Manager'] },
+  { path: '/agents', label: 'Agents', icon: Users, roles: ['Admin', 'Manager'] },
+  { path: '/schedules', label: 'Horaire de Travail', icon: Calendar, roles: ['Admin', 'Manager'] },
+  { path: '/calendar', label: 'Calendrier', icon: CalendarDays, roles: ['Admin', 'Manager'] },
   /*{ path: '/statistics', label: 'Statistics & Reports', icon: BarChart3, roles: ['Admin', 'Manager'] },*/
-  { path: '/settings', label: 'Settings & Users', icon: Settings, roles: ['Admin', 'Manager'] },
+  { path: '/settings', label: 'Paramètres', icon: Settings, roles: ['Admin', 'Manager'] },
 ];
 
 // --- Layout Component ---
@@ -144,8 +144,8 @@ export function Layout() {
    */
   const handleLogout = () => {
     logout();
-    toast.success('Logged out successfully', {
-      description: 'You have been securely logged out of the system.',
+    toast.success('Déconnexion Réussi', {
+      description: 'Vous avez été déconnecté du system.',
     });
     navigate('/login');
   };
@@ -159,26 +159,6 @@ export function Layout() {
       description: 'Opening profile settings...',
     });
     navigate('/settings');
-  };
-
-  /**
-   * Handle notifications button click
-   * Placeholder for future notification system
-   */
-  const handleNotifications = () => {
-    toast.info('Notifications', {
-      description: 'No new notifications',
-    });
-  };
-
-  /**
-   * Handle help/documentation access
-   * Placeholder for future help system
-   */
-  const handleHelp = () => {
-    toast.info('Help Center', {
-      description: 'Opening help documentation...',
-    });
   };
 
   // --- Utility Functions ---
@@ -215,8 +195,8 @@ export function Layout() {
         
         {/* --- Application Logo/Header --- */}
         <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-          <h1 className="text-blue-600 dark:text-blue-400">Staff Attendance</h1>
-          <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">Management System</p>
+          <h1 className="text-blue-600 dark:text-blue-400">Gestion de Pointage</h1>
+          <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">des Agents Publiques</p>
         </div>
         
         {/* --- Navigation Menu --- */}
@@ -301,7 +281,7 @@ export function Layout() {
                 className="cursor-pointer dark:hover:bg-gray-700 dark:text-gray-200 focus:bg-blue-50 dark:focus:bg-blue-950 focus:text-blue-600 dark:focus:text-blue-400"
               >
                 <User className="w-4 h-4 mr-3" />
-                My Profile
+                Profil
               </DropdownMenuItem>
               
               <DropdownMenuSeparator className="dark:bg-gray-700" />
@@ -311,7 +291,7 @@ export function Layout() {
                 className="cursor-pointer text-red-600 dark:text-red-400 focus:bg-red-50 dark:focus:bg-red-950 focus:text-red-600 dark:focus:text-red-400"
               >
                 <LogOut className="w-4 h-4 mr-3" />
-                Log Out
+                Déconnexion
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
