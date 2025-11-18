@@ -475,9 +475,7 @@ export function AgentsManagement() {
           <div>
             <h1 className="text-gray-900 dark:text-gray-100">Gestion des Agents</h1>
             <p className="text-gray-500 dark:text-gray-400 mt-1">
-              {isAdmin 
-                ? 'Manage your staff members and their information.' 
-                : 'View staff members and their information.'}
+              Gérez les agents et leurs informations
             </p>
           </div>
         </div>

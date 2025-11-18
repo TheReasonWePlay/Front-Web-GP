@@ -4,6 +4,8 @@ import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Badge } from '../ui/badge';
 import { Calendar as CalendarIcon, Plus, Download, Upload, Trash2, Users, UserCheck, UserX, Clock, TrendingUp } from 'lucide-react';
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 import {
   Dialog,
   DialogContent,
@@ -66,6 +68,11 @@ export function CalendarHolidays() {
   const [isSubmittingHoliday, setIsSubmittingHoliday] = useState(false);
 
   //--------------------------
+
+  const [dateDeb, setDateDeb] = useState("");
+  const [dateFin, setDateFin] = useState("");
+
+  //------------------------------------------------
 
   useEffect(() => {
     const loadMonthStats = async () => {
@@ -294,6 +301,7 @@ const handleAddHoliday = async () => {
     if (day === null) return;
     const clickedDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
     setSelectedDate(clickedDate);
+    setDateDeb(clickedDate);
   
     try {
       const data = await getDayStatistics(clickedDate);
@@ -320,6 +328,226 @@ const handleAddHoliday = async () => {
   
     return `${h}h ${m}`;
   }
+
+
+  //-------------------------------------------
+
+  const fetchRangeDetails = async (start: string, end: string): Promise<DayStatistics[]> => {
+    const startDate = new Date(start);
+    const endDate = new Date(end);
+  
+    const results: DayStatistics[] = [];
+  
+    let d = new Date(startDate);
+  
+    while (d <= endDate) {
+      const dayData = await getDayStatistics(new Date(d));
+  
+      results.push({
+        ...dayData,
+        date: d.toISOString().split("T")[0],  // écrase proprement
+      });
+  
+      d.setDate(d.getDate() + 1);
+    }
+  
+    return results;
+  };
+
+  const exportPresencePDF = async () => {
+    if (!dateDeb && !dateFin) {
+      alert("Veuillez sélectionner au moins une date.");
+      return;
+    }
+  
+    const start = dateDeb || dateFin;
+    const end = dateFin || dateDeb;
+  
+    // Récupérer les détails du range
+    let rangeDetails = await fetchRangeDetails(start, end);
+  
+    if (rangeDetails.length === 0) {
+      alert("Aucune donnée trouvée.");
+      return;
+    }
+  
+    // Fonction isHoliday adaptée (tu peux modifier currentDate si besoin)
+    const isHoliday = (dateStr: string): boolean => {
+      if (!dateStr) return false;
+  
+      // Exemple d'implémentation basée sur ta fonction
+      return holidays.some(h => {
+        if (h.recurring) {
+          // comparer seulement mois-jour
+          return formatLocalMD(h.date) === formatLocalMD(dateStr);
+        }
+        return formatLocalYMD(h.date) === dateStr;
+      });
+    };
+  
+    // Filtrer pour enlever samedis, dimanches et jours fériés
+    rangeDetails = rangeDetails.filter(day => {
+      const dateObj = new Date(day.date);
+      const dayOfWeek = dateObj.getDay(); // 0=dimanche, 6=samedi
+      if (dayOfWeek === 0 || dayOfWeek === 6) return false; // exclure weekend
+  
+      // Formater date en YYYY-MM-DD pour isHoliday
+      const dateStr = dateObj.toISOString().split("T")[0];
+      if (isHoliday(dateStr)) return false; // exclure jour férié
+  
+      return true;
+    });
+  
+    if (rangeDetails.length === 0) {
+      alert("Aucune donnée disponible hors weekends et jours fériés.");
+      return;
+    }
+  
+    // Trie et suite du code inchangé...
+  
+    rangeDetails.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  
+    const doc = new jsPDF({
+      orientation: "landscape",
+    });
+  
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+  
+    const companyName = "SERVICE REGIONAL DU BUDGET";
+  
+    const drawHeader = () => {
+      doc.setTextColor(33, 37, 41);
+  
+      doc.setFontSize(20);
+      doc.setFont("helvetica", "bold");
+      doc.text(companyName, pageWidth / 2, 15, { align: "center" });
+  
+      doc.setFontSize(15);
+      doc.setFont("helvetica", "normal");
+      doc.text("Haute Matsiatra", pageWidth / 2, 22, { align: "center" });
+  
+      doc.setFontSize(16);
+      doc.setFont("helvetica", "normal");
+      doc.text("Fiche de Présence", pageWidth / 2, 35, { align: "center" });
+    };
+  
+    drawHeader();
+  
+    doc.setFontSize(12);
+    doc.setTextColor(70, 70, 70);
+    if (start === end) {
+      doc.text(
+        `Période du ${new Date(start).toLocaleDateString("fr-FR", {
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+        })}`,
+        14,
+        40
+      );
+    } else {
+      doc.text(
+        `Période du ${new Date(start).toLocaleDateString("fr-FR", {
+          day: "numeric",
+          month: "long",
+        })} au ${new Date(end).toLocaleDateString("fr-FR", {
+          day: "numeric",
+          month: "long",
+        })} année ${new Date(start).toLocaleDateString("fr-FR", { year: "numeric" })}`,
+        14,
+        40
+      );
+    }
+  
+    doc.setDrawColor(41, 128, 185);
+    doc.setLineWidth(1);
+    doc.line(14, 45, pageWidth - 14, 45);
+  
+    let currentY = 55;
+  
+    const drawFooter = () => {
+      const pageNumber = doc.getNumberOfPages();
+      const footerText = `Page ${pageNumber}`;
+      doc.setFontSize(9);
+      doc.setTextColor(150);
+      doc.text(footerText, pageWidth / 2, pageHeight - 10, { align: "center" });
+    };
+  
+    for (const day of rangeDetails) {
+      const formattedDate = new Date(day.date).toLocaleDateString("fr-FR", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      });
+  
+      if (currentY > 55) {
+        currentY += 10;
+        if (currentY > pageHeight - 40) {
+          drawFooter();
+          doc.addPage();
+          currentY = 20;
+        }
+      }
+  
+      doc.setFontSize(12);
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(41, 128, 185);
+      doc.text(`Date : ${formattedDate}`, 14, currentY);
+      currentY += 8;
+  
+      const tableRows = day.pointageRecords.map((item) => [
+        item.agentName,
+        item.division,
+        item.checkInAM || "-",
+        item.checkOutAM || "-",
+        item.checkInPM || "-",
+        item.checkOutPM || "-",
+        item.temporaryExits ? item.temporaryExits.length : 0,
+        item.totalMissedTime || "0h 00m",
+      ]);
+  
+      autoTable(doc, {
+        startY: currentY,
+        head: [
+          [
+            "Agent",
+            "Division",
+            "Arrivé AM",
+            "Sortie AM",
+            "Arrivé PM",
+            "Sortie PM",
+            "Sorties",
+            "Heure manquée",
+          ],
+        ],
+        body: tableRows,
+        styles: { fontSize: 10 },
+        headStyles: { fillColor: [41, 128, 185], textColor: 255, fontStyle: "bold" },
+        alternateRowStyles: { fillColor: [235, 243, 255] },
+        margin: { left: 14, right: 14 },
+        didDrawPage: () => {
+          drawFooter();
+        },
+      });
+  
+      currentY = (doc as any).lastAutoTable.finalY + 10;
+  
+      if (currentY > pageHeight - 40) {
+        doc.addPage();
+        currentY = 20;
+      }
+    }
+  
+    drawFooter();
+  
+    doc.save(`presence_${start}_au_${end}.pdf`);
+    setDateDeb("");
+    setDateFin("");
+  };
+  
+  
+  
 
   return (
     <TooltipProvider delayDuration={300}>
@@ -369,17 +597,21 @@ const handleAddHoliday = async () => {
                 return (
                   <Tooltip key={index}>
                     <TooltipTrigger asChild>
-                      <div
-                        onClick={() => handleDateClick(day)}
-                        className={`
-                          aspect-square p-2 text-center rounded-lg border transition-all
-                          ${day === null ? 'border-transparent' : 'border-gray-200 dark:border-gray-600'}
-                          ${isToday(day) ? 'bg-blue-100 dark:bg-blue-900/40 border-blue-500 dark:border-blue-600 ring-2 ring-blue-300 dark:ring-blue-700' : ''}
-                          ${isWeekend(day) && !isHoliday(day) ? 'bg-gray-50 dark:bg-gray-900/50' : ''}
-                          ${isHoliday(day) ? 'bg-red-50 dark:bg-red-900/30 border-red-200 dark:border-red-700' : ''}
-                          ${day !== null ? 'hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-md cursor-pointer hover:scale-105' : ''}
-                        `}
-                      >
+                    <div
+                      onClick={() => {
+                        if (day !== null && !isWeekend(day) && !isHoliday(day)) {
+                          handleDateClick(day);
+                        }
+                      }}
+                      className={`
+                        aspect-square p-2 text-center rounded-lg border transition-all
+                        ${day === null ? 'border-transparent' : 'border-gray-200 dark:border-gray-600'}
+                        ${isToday(day) ? 'bg-blue-100 dark:bg-blue-900/40 border-blue-500 dark:border-blue-600 ring-2 ring-blue-300 dark:ring-blue-700' : ''}
+                        ${isWeekend(day) && !isHoliday(day) ? 'bg-gray-50 dark:bg-gray-900/50' : ''}
+                        ${isHoliday(day) ? 'bg-red-50 dark:bg-red-900/30 border-red-200 dark:border-red-700' : ''}
+                        ${day !== null ? 'hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-md cursor-pointer hover:scale-105' : ''}
+                      `}
+                    >
                         {day !== null && (
                           <div className="h-full flex flex-col items-center justify-center">
                             <span className={`text-sm ${isToday(day) ? 'text-blue-600 dark:text-blue-400' : 'text-gray-900 dark:text-gray-100'}`}>
@@ -509,21 +741,40 @@ const handleAddHoliday = async () => {
                 ))}
               </div>
             </Card>
-{/*
+
             <Card className="p-6 border border-gray-200 dark:border-gray-700 dark:bg-gray-800 rounded-xl shadow-sm">
-              <h3 className="text-gray-900 dark:text-gray-100 mb-4">Import / Export</h3>
+              <h3 className="text-gray-900 dark:text-gray-100 mb-4">Fiche de Présence</h3>
               <div className="space-y-2">
-                <Button variant="outline" className="w-full justify-start border-gray-300 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 rounded-lg">
-                  <Upload className="w-4 h-4 mr-2" />
-                  Import .ics File
-                </Button>
-                <Button variant="outline" className="w-full justify-start border-gray-300 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 rounded-lg">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="date_deb" className="dark:text-gray-200">Date de Début</Label>
+                    <Input
+                      id="date_deb"
+                      type="date"
+                      className="bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-600 dark:text-gray-100"
+                      value={dateDeb}
+                      onChange={e => setDateDeb(e.target.value)}
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="date_fin" className="dark:text-gray-200">Date de Fin</Label>
+                    <Input
+                      id="date_fin"
+                      type="date"
+                      className="bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-600 dark:text-gray-100"
+                      value={dateFin}
+                      onChange={e => setDateFin(e.target.value)}
+                    />
+                  </div>
+                </div>
+                <br></br>
+                <Button variant="outline" onClick={exportPresencePDF} className="h-12 w-full justify-center border-gray-300 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 rounded-lg">
                   <Download className="w-4 h-4 mr-2" />
-                  Export Calendar
+                  Exporter fiche de présence
                 </Button>
               </div>
             </Card>
-*/}
+
           </div>
         </div>
 
@@ -594,7 +845,7 @@ const handleAddHoliday = async () => {
 
 
         {/* Day Details Dialog */}
-        <Dialog open={!!selectedDate} onOpenChange={() => setSelectedDate(null)}>
+        <Dialog open={!!selectedDate} onOpenChange={() => {setSelectedDate(null); setDayDetails(null)}}>
           <DialogContent className="sm:max-w-6xl h-[90vh] flex flex-col dark:bg-gray-800 dark:border-gray-700 p-0">
             {/* Fixed Header */}
             <div className="p-6 border-b border-gray-200 dark:border-gray-700">
@@ -817,14 +1068,14 @@ const handleAddHoliday = async () => {
               <DialogFooter>
                 <Button 
                   variant="outline" 
-                  onClick={() => setSelectedDate(null)}
+                  onClick={() => {setSelectedDate(null); setDayDetails(null)}}
                   className="dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
                 >
                   Fermer
                 </Button>
-                <Button className="bg-blue-600 hover:bg-blue-700">
+                <Button className="bg-blue-600 hover:bg-blue-700" onClick={exportPresencePDF}>
                   <Download className="w-4 h-4 mr-2" />
-                  Exporter rapport
+                  Exporter
                 </Button>
               </DialogFooter>
             </div>
