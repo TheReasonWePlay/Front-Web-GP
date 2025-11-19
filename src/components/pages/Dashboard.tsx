@@ -24,6 +24,24 @@ import { statisticsService } from '../../lib/api';
 import { useApi } from '../../lib/hooks/useApi';
 import type { DashboardStats, RecentActivity } from '../../lib/api/types';
 import { toast } from 'sonner';
+import { Label } from '../ui/label';
+
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../ui/select';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '../ui/dialog';
+import { generateMonthlyReport } from '../../lib/api/report.service';
 
 export function Dashboard() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
@@ -32,6 +50,11 @@ export function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const [isReportDialogOpen, setIsReportDialogOpen] = useState(false);
+
+
+  const [selectedMonth, setSelectedMonth] = useState<string>(String(new Date().getMonth() + 1));
+  const [selectedYear, setSelectedYear] = useState<string>(String(new Date().getFullYear()));
   // Fetch all dashboard data
   const fetchDashboardData = async () => {
     setLoading(true);
@@ -184,7 +207,40 @@ export function Dashboard() {
       </div>
     );
   }
+  
+    // Exemple : mois actuel
+     // car janvier == 0
+  
+    const handleGenerate = async () => {
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth() + 1;
+      setLoading(true);
+      try {
+        await generateMonthlyReport(currentYear, currentMonth);
+      } catch (err) {
+        console.error(err);
+      }
+      setLoading(false);
+      toast.success("Rapport Génerer avec Succes");
+    }
 
+      // Handle report generation
+    const handleGenerateReport = async() => {
+      const now = new Date(2025, parseInt(selectedMonth) - 1, 1);
+      const currentYear = now.getFullYear();
+      const currentMonth = now.getMonth() + 1;
+      setLoading(true);
+      try {
+        await generateMonthlyReport(currentYear, currentMonth);
+      } catch (err) {
+        console.error(err);
+      }
+      setLoading(false);
+      setIsReportDialogOpen(false);
+      toast.success("Rapport Génerer avec Succes");
+    }
+        
   return (
     <div className="p-8">
       <div className="mb-8 flex items-center justify-between">
@@ -327,13 +383,13 @@ export function Dashboard() {
         <Card className="p-6 border border-gray-200 dark:border-gray-700 dark:bg-gray-800 rounded-xl shadow-sm">
           <h3 className="text-gray-900 dark:text-gray-100 mb-4">Actions rapide</h3>
           <div className="space-y-3">
-            <Button variant="outline" className="w-full justify-start border-gray-300 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 rounded-lg">
+            <Button variant="outline" onClick={handleGenerate} className="w-full justify-start border-gray-300 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 rounded-lg">
               <FileText className="w-4 h-4 mr-2" />
-              Generer Report Mensuel
+              Generer Rapport du Mois
             </Button>
-            <Button variant="outline" className="w-full justify-start border-gray-300 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 rounded-lg">
+            <Button variant="outline" onClick={() => setIsReportDialogOpen(true)} className="w-full justify-start border-gray-300 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 rounded-lg">
               <FileText className="w-4 h-4 mr-2" />
-              Generer Report personalisé
+              Generer Rapport personalisé
             </Button>
           </div>
 
@@ -361,6 +417,73 @@ export function Dashboard() {
           )}
         </Card>
       </div>
+
+      {/* Report Dialog */}
+      <Dialog open={isReportDialogOpen} onOpenChange={setIsReportDialogOpen}>
+        <DialogContent className="sm:max-w-[425px] dark:bg-gray-800 dark:border-gray-700">
+          <DialogHeader>
+            <DialogTitle className="dark:text-gray-100">Generate Report</DialogTitle>
+            <DialogDescription className="dark:text-gray-400">
+              Select the month and year for the report.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid grid-cols-2 gap-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="month" className="dark:text-gray-300">Month</Label>
+              <Select value={selectedMonth} onValueChange={setSelectedMonth}>
+                <SelectTrigger className="dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200">
+                  <SelectValue placeholder="Select month" />
+                </SelectTrigger>
+                <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
+                  <SelectItem value="1">January</SelectItem>
+                  <SelectItem value="2">February</SelectItem>
+                  <SelectItem value="3">March</SelectItem>
+                  <SelectItem value="4">April</SelectItem>
+                  <SelectItem value="5">May</SelectItem>
+                  <SelectItem value="6">June</SelectItem>
+                  <SelectItem value="7">July</SelectItem>
+                  <SelectItem value="8">August</SelectItem>
+                  <SelectItem value="9">September</SelectItem>
+                  <SelectItem value="10">October</SelectItem>
+                  <SelectItem value="11">November</SelectItem>
+                  <SelectItem value="12">December</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="year" className="dark:text-gray-300">Year</Label>
+              <Select value={selectedYear} onValueChange={setSelectedYear}>
+                <SelectTrigger className="dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200">
+                  <SelectValue placeholder="Select year" />
+                </SelectTrigger>
+                <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
+                  <SelectItem value="2023">2023</SelectItem>
+                  <SelectItem value="2024">2024</SelectItem>
+                  <SelectItem value="2025">2025</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter className="gap-2">
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={() => setIsReportDialogOpen(false)}
+              className="dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-600"
+            >
+              Annulé
+            </Button>
+            <Button 
+              type="button" 
+              className="bg-blue-600 hover:bg-blue-700 text-white" 
+              onClick={handleGenerateReport}
+            >
+              <FileText className="w-4 h-4 mr-2" />
+              Generer
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

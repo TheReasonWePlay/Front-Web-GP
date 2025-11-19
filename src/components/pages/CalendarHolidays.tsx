@@ -35,6 +35,7 @@ import type { Holiday } from '../../lib/api/types';
 import { getDayStatistics, type DayStatistics } from '../../lib/api/legacy-types';
 import { ConfirmDialog } from '../ConfirmDialog';
 import { toast } from 'sonner';
+import { getInitials } from '../../lib/utils';
 
 const daysOfWeek = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
 const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -356,7 +357,7 @@ const handleAddHoliday = async () => {
 
   const exportPresencePDF = async () => {
     if (!dateDeb && !dateFin) {
-      alert("Veuillez sélectionner au moins une date.");
+      toast.warning("Veuillez sélectionner au moins une date.");
       return;
     }
   
@@ -367,7 +368,7 @@ const handleAddHoliday = async () => {
     let rangeDetails = await fetchRangeDetails(start, end);
   
     if (rangeDetails.length === 0) {
-      alert("Aucune donnée trouvée.");
+      toast.error("Aucune donnée trouvée.");
       return;
     }
   
@@ -399,7 +400,7 @@ const handleAddHoliday = async () => {
     });
   
     if (rangeDetails.length === 0) {
-      alert("Aucune donnée disponible hors weekends et jours fériés.");
+      toast.error("Aucune donnée disponible hors weekends et jours fériés.");
       return;
     }
   
@@ -499,10 +500,10 @@ const handleAddHoliday = async () => {
       const tableRows = day.pointageRecords.map((item) => [
         item.agentName,
         item.division,
-        item.checkInAM || "-",
-        item.checkOutAM || "-",
-        item.checkInPM || "-",
-        item.checkOutPM || "-",
+        formatTimeToHourMinute(item.checkInAM) || "-",
+        formatTimeToHourMinute(item.checkOutAM) || "-",
+        formatTimeToHourMinute(item.checkInPM) || "-",
+        formatTimeToHourMinute(item.checkOutPM) || "-",
         item.temporaryExits ? item.temporaryExits.length : 0,
         item.totalMissedTime || "0h 00m",
       ]);
@@ -542,7 +543,6 @@ const handleAddHoliday = async () => {
     drawFooter();
   
     doc.save(`presence_${start}_au_${end}.pdf`);
-    setDateDeb("");
     setDateFin("");
   };
   
@@ -845,7 +845,7 @@ const handleAddHoliday = async () => {
 
 
         {/* Day Details Dialog */}
-        <Dialog open={!!selectedDate} onOpenChange={() => {setSelectedDate(null); setDayDetails(null)}}>
+        <Dialog open={!!selectedDate} onOpenChange={() => {setSelectedDate(null); setDayDetails(null); setDateDeb("");}}>
           <DialogContent className="sm:max-w-6xl h-[90vh] flex flex-col dark:bg-gray-800 dark:border-gray-700 p-0">
             {/* Fixed Header */}
             <div className="p-6 border-b border-gray-200 dark:border-gray-700">
@@ -978,7 +978,7 @@ const handleAddHoliday = async () => {
                               <TableCell>
                                 <div className="flex items-center gap-2">
                                   <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-xs text-blue-600 dark:text-blue-400">
-                                    {record.agentName.split(' ').map(n => n[0]).join('')}
+                                    {getInitials(record.agentName)}
                                   </div>
                                   <span className="text-gray-900 dark:text-gray-100 whitespace-nowrap">{record.agentName}</span>
                                 </div>
@@ -1068,7 +1068,7 @@ const handleAddHoliday = async () => {
               <DialogFooter>
                 <Button 
                   variant="outline" 
-                  onClick={() => {setSelectedDate(null); setDayDetails(null)}}
+                  onClick={() => {setSelectedDate(null); setDayDetails(null); setDateDeb("")}}
                   className="dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
                 >
                   Fermer

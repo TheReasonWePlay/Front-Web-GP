@@ -567,7 +567,7 @@ export interface MonthlyAttendance {
  */
 export interface RecentActivity {
   agentName: string;
-  type: 'check-in' | 'check-out' | 'leave-request';
+  type: string;
   description: string;
   timestamp: string;
 }
